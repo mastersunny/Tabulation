@@ -57,7 +57,10 @@ public class PDFService {
             PdfWriter.getInstance(document,
                     new FileOutputStream("table.pdf"));
 
+            document.setMargins(90,80,35,40);
+           
             document.open();
+            
 
             if (!courseList.isEmpty()) {
 
@@ -268,9 +271,9 @@ public class PDFService {
 
         //start creating header for the document......
         PdfPTable headerTable = new PdfPTable(3);
-      
+        headerTable.setHorizontalAlignment(Element.ALIGN_LEFT);
         try {
-            headerTable.setTotalWidth(new float[]{57.5f, 519, 170});
+            headerTable.setTotalWidth(new float[]{57.5f, 545, 176});
             headerTable.setLockedWidth(true);
 
         } catch (DocumentException ex) {
@@ -313,12 +316,12 @@ public class PDFService {
         infoCell.setBorder(Rectangle.NO_BORDER);
         headerTable.addCell(infoCell);
 
-        PdfPCell resultPublishDateCell = new PdfPCell(new Paragraph("Result Published On..........", new Font(Font.FontFamily.TIMES_ROMAN, 10, Font.BOLD)));
+        PdfPCell resultPublishDateCell = new PdfPCell(new Paragraph("Result Published On............................", new Font(Font.FontFamily.TIMES_ROMAN, 10, Font.BOLD)));
         resultPublishDateCell.setBorder(Rectangle.NO_BORDER);
         resultPublishDateCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
         resultPublishDateCell.setHorizontalAlignment(Element.ALIGN_CENTER);
         headerTable.addCell(resultPublishDateCell);
-        headerTable.setSpacingAfter(10); 
+        headerTable.setSpacingAfter(20); 
 
         // System.err.println("completed header table");
         return headerTable;
@@ -431,6 +434,7 @@ public class PDFService {
     public PdfPTable createMainTableHeader(int courseStart) {
 
         PdfPTable table = new PdfPTable(14);
+        table.setHorizontalAlignment(Element.ALIGN_LEFT);
 
         try {
             table.setTotalWidth(new float[]{57.5f, 159.4f, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44});
@@ -546,6 +550,7 @@ public class PDFService {
     private PdfPTable createExtensionTableHeader(int tableSize, int courseStart, boolean flag) {
 
         PdfPTable table = new PdfPTable(tableSize);
+        table.setHorizontalAlignment(Element.ALIGN_LEFT);
 
         try {
             
