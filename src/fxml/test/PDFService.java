@@ -34,7 +34,7 @@ public class PDFService {
     Font font4 = new Font(FontFamily.TIMES_ROMAN, 4);
     Font font8 = new Font(Font.FontFamily.TIMES_ROMAN, 8);
     Font font9 = new Font(Font.FontFamily.TIMES_ROMAN, 9);
-    Font font10 = new Font(Font.FontFamily.TIMES_ROMAN, 11);
+    Font font10 = new Font(Font.FontFamily.TIMES_ROMAN, 10.5f);
     Font font7 = new Font(Font.FontFamily.TIMES_ROMAN, 7);
 
     List<Student> studentList;
@@ -101,7 +101,8 @@ public class PDFService {
                                 //start document footer
                                 table.setSpacingAfter(20);
                                 document.add(table);
-                                document.add(createFooter());
+                                document.add(createFooter1());
+                                document.add(createFooter2());
                                 document.newPage();
                                 //end document footer
                             }
@@ -141,7 +142,8 @@ public class PDFService {
                             //start document footer
                             table.setSpacingAfter(20);
                             document.add(table);
-                            document.add(createFooter());
+                            document.add(createFooter1());
+                            document.add(createFooter2());
                             document.newPage();
                             //end document footer
 
@@ -157,7 +159,8 @@ public class PDFService {
                                 //end table body
 
                             //start document footer
-                            document.add(createFooter());
+                            document.add(createFooter1());
+                            document.add(createFooter2());
                             document.newPage();
                                 //end document footer
 
@@ -190,7 +193,8 @@ public class PDFService {
                             //start document footer
                             table.setSpacingAfter(20);
                             document.add(table);
-                            document.add(createFooter());
+                            document.add(createFooter1());
+                            document.add(createFooter2());
                             document.newPage();
                             //end document footer
                         }
@@ -230,7 +234,8 @@ public class PDFService {
                         //start document footer
                         table.setSpacingAfter(20);
                         document.add(table);
-                        document.add(createFooter());
+                        document.add(createFooter1());
+                        document.add(createFooter2());
                         document.newPage();
                         //end document footer
 
@@ -246,7 +251,8 @@ public class PDFService {
                             //end table body
 
                         //start document footer
-                        document.add(createFooter());
+                        document.add(createFooter1());
+                        document.add(createFooter2());
                             //end document footer
 
                         //end cumulative table
@@ -342,14 +348,14 @@ public class PDFService {
 
     }
 
-    public PdfPTable createFooter() {
+    public PdfPTable createFooter1() {
 
         //String[] names = new String[]{"Md. Eamin Rahman", "Md. Mujibur Rahman", "Md Masum", "Md. Saiful Islam", "Husne Ara Chowdhury", "Sabir Ismail"};
         PdfPTable table = new PdfPTable(5);
         table.setHorizontalAlignment(Element.ALIGN_LEFT);
         
         try {
-            table.setTotalWidth(new float[]{161f, 161f, 133f,165f,161f});
+            table.setTotalWidth(new float[]{161f, 161f, 133f,167f,161f});
             table.setLockedWidth(true);
 
         } catch (DocumentException ex) {
@@ -370,66 +376,102 @@ public class PDFService {
         blankColumn.setBorder(Rectangle.NO_BORDER);
         table.addCell(blankColumn);
 
-        PdfPCell controllerSignature = new PdfPCell(new Paragraph("Signature of The Controller of Examinations:", font9));
+        
+        Paragraph p = new Paragraph("Signature of The Controller of Examinations:", font9);
+        p.setLeading(0,1.3f);
+        PdfPCell controllerSignature = new PdfPCell();
+        controllerSignature.addElement(p);
         controllerSignature.setBorder(Rectangle.NO_BORDER);
-        controllerSignature.setPaddingTop(5);
         table.addCell(controllerSignature);
         table.addCell(underLine);
-        
-        
+         
         PdfPCell cell1 = new PdfPCell(new Paragraph(inputs.get(5).trim(), font9));
+        cell1.setPaddingTop(0f);
         cell1.setBorder(Rectangle.NO_BORDER);
 
         PdfPCell cell2 = new PdfPCell(new Paragraph(inputs.get(6).trim(), font9));
+        cell2.setPaddingTop(0f);
         cell2.setBorder(Rectangle.NO_BORDER);
-
-        PdfPCell cell3 = new PdfPCell(new Paragraph(inputs.get(7).trim(), font9));
-        cell3.setBorder(Rectangle.NO_BORDER);
-
-        PdfPCell cell4 = new PdfPCell(new Paragraph(inputs.get(8).trim(), font9));
-        cell4.setBorder(Rectangle.NO_BORDER);
-
-        PdfPCell cell5 = new PdfPCell(new Paragraph(inputs.get(9).trim(), font9));
-        cell5.setBorder(Rectangle.NO_BORDER);
-
-        PdfPCell cell6 = new PdfPCell(new Paragraph(inputs.get(10).trim(), font9));
-        cell6.setBorder(Rectangle.NO_BORDER);
 
         PdfPCell nameColumn = new PdfPCell(new Paragraph("Name :", font9));
         nameColumn.setBorder(Rectangle.NO_BORDER);
         nameColumn.setPaddingLeft(0f);
-        table.addCell(nameColumn);
-
+        nameColumn.setPaddingTop(0f);
+        
         PdfPCell nameColumn2 = new PdfPCell(new Paragraph("Name :", font9));
         nameColumn2.setBorder(Rectangle.NO_BORDER);
-        table.addCell(nameColumn2);
+        nameColumn2.setPaddingTop(0f);
         
-        table.addCell(cell1);
+        table.addCell(nameColumn);
+        table.addCell(cell1);  
         table.addCell(blankColumn);
         table.addCell(nameColumn2);
         table.addCell(cell2);
         
-        /*
+        table.setSpacingAfter(25);
+        return table;
+    }
+    
+    public PdfPTable createFooter2(){
+        
+        PdfPTable table = new PdfPTable(8);
+        table.setHorizontalAlignment(Element.ALIGN_LEFT);
+        
+        try {
+            table.setTotalWidth(new float[]{192f, 144f,5f, 144f,5f,144f,5f,144f});
+            table.setLockedWidth(true);
 
-        table.addCell(blankColumn);
-        table.addCell(blankColumn);
-        table.addCell(blankColumn);
-        table.addCell(blankColumn);
-        table.addCell(blankColumn);
+        } catch (DocumentException ex) {
+            Logger.getLogger(PDFService.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        PdfPCell underLine = new PdfPCell(new Paragraph("_____________________"));
+        //underLine.setPaddingLeft(0f);
+        underLine.setBorder(Rectangle.NO_BORDER);
+        
+        PdfPCell blankColumn = new PdfPCell(new Paragraph(" "));
+        blankColumn.setBorder(Rectangle.NO_BORDER);
+        
+        PdfPCell blankColumn2 = new PdfPCell(new Paragraph(" "));
+        blankColumn2.setBorder(Rectangle.BOTTOM);
+        
+        PdfPCell nameColumn = new PdfPCell(new Paragraph("Name :", font9));
+        nameColumn.setBorder(Rectangle.NO_BORDER);
+        nameColumn.setPaddingLeft(0f);
+        
+        PdfPCell cell3 = new PdfPCell(new Paragraph(inputs.get(7).trim(), font9));
+        cell3.setPaddingRight(2);
+        cell3.setBorder(Rectangle.TOP);
 
+        PdfPCell cell4 = new PdfPCell(new Paragraph(inputs.get(8).trim(), font9));
+        cell4.setBorder(Rectangle.TOP);
+
+        PdfPCell cell5 = new PdfPCell(new Paragraph(inputs.get(9).trim(), font9));
+        cell5.setBorder(Rectangle.TOP);
+
+        PdfPCell cell6 = new PdfPCell(new Paragraph(inputs.get(10).trim(), font9));
+        cell6.setBorder(Rectangle.TOP);
+          
         PdfPCell memberSIgnature = new PdfPCell(new Paragraph("Signature of the Members:", font9));
+        memberSIgnature.setPaddingLeft(0f);
         memberSIgnature.setBorder(Rectangle.NO_BORDER);
+        
         table.addCell(memberSIgnature);
-
-        table.addCell(underLine);
-        table.addCell(underLine);
-        table.addCell(underLine);
-        table.addCell(underLine);
+        table.addCell(blankColumn);
+        table.addCell(blankColumn);
+        table.addCell(blankColumn);
+        table.addCell(blankColumn);
+        table.addCell(blankColumn);
+        table.addCell(blankColumn);
+        table.addCell(blankColumn);
 
         table.addCell(nameColumn);
         table.addCell(cell3);
+        table.addCell(blankColumn);
         table.addCell(cell4);
+        table.addCell(blankColumn);
         table.addCell(cell5);
+        table.addCell(blankColumn);
         table.addCell(cell6);
 
         table.addCell(blankColumn);
@@ -437,17 +479,27 @@ public class PDFService {
         table.addCell(blankColumn);
         table.addCell(blankColumn);
         table.addCell(blankColumn);
+        table.addCell(blankColumn);
+        table.addCell(blankColumn);
+        table.addCell(blankColumn);
 
         PdfPCell tabulatorSIgnature = new PdfPCell(new Paragraph("Signature of the Tabulators:", font9));
+        tabulatorSIgnature.setPaddingLeft(0f);
         tabulatorSIgnature.setBorder(Rectangle.NO_BORDER);
+        
         table.addCell(tabulatorSIgnature);
-
-        table.addCell(underLine);
-        table.addCell(underLine);
-        table.addCell(underLine);
-        table.addCell(underLine);*/
-
+        table.addCell(blankColumn2);
+        table.addCell(blankColumn);
+        table.addCell(blankColumn2);
+        table.addCell(blankColumn);
+        table.addCell(blankColumn2);
+        table.addCell(blankColumn);
+        table.addCell(blankColumn2);
+        
+        
         return table;
+        
+        
     }
 
     public PdfPTable createMainTableHeader(int courseStart) {
