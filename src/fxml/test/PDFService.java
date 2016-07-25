@@ -346,12 +346,23 @@ public class PDFService {
 
         //String[] names = new String[]{"Md. Eamin Rahman", "Md. Mujibur Rahman", "Md Masum", "Md. Saiful Islam", "Husne Ara Chowdhury", "Sabir Ismail"};
         PdfPTable table = new PdfPTable(5);
+        table.setHorizontalAlignment(Element.ALIGN_LEFT);
+        
+        try {
+            table.setTotalWidth(new float[]{161f, 161f, 133f,165f,161f});
+            table.setLockedWidth(true);
+
+        } catch (DocumentException ex) {
+            Logger.getLogger(PDFService.class.getName()).log(Level.SEVERE, null, ex);
+        }
         //table.setWidthPercentage(100);
         PdfPCell chairmanSIgnature = new PdfPCell(new Paragraph("Signature of the Chairman:", font9));
         chairmanSIgnature.setBorder(Rectangle.NO_BORDER);
+        chairmanSIgnature.setPaddingLeft(0f);
+        chairmanSIgnature.setPaddingTop(5);
         table.addCell(chairmanSIgnature);
 
-        PdfPCell underLine = new PdfPCell(new Paragraph("________________"));
+        PdfPCell underLine = new PdfPCell(new Paragraph("_______________________"));
         underLine.setBorder(Rectangle.NO_BORDER);
         table.addCell(underLine);
 
@@ -361,10 +372,11 @@ public class PDFService {
 
         PdfPCell controllerSignature = new PdfPCell(new Paragraph("Signature of The Controller of Examinations:", font9));
         controllerSignature.setBorder(Rectangle.NO_BORDER);
+        controllerSignature.setPaddingTop(5);
         table.addCell(controllerSignature);
-
         table.addCell(underLine);
-
+        
+        
         PdfPCell cell1 = new PdfPCell(new Paragraph(inputs.get(5).trim(), font9));
         cell1.setBorder(Rectangle.NO_BORDER);
 
@@ -385,12 +397,19 @@ public class PDFService {
 
         PdfPCell nameColumn = new PdfPCell(new Paragraph("Name :", font9));
         nameColumn.setBorder(Rectangle.NO_BORDER);
+        nameColumn.setPaddingLeft(0f);
         table.addCell(nameColumn);
 
+        PdfPCell nameColumn2 = new PdfPCell(new Paragraph("Name :", font9));
+        nameColumn2.setBorder(Rectangle.NO_BORDER);
+        table.addCell(nameColumn2);
+        
         table.addCell(cell1);
         table.addCell(blankColumn);
-        table.addCell(nameColumn);
+        table.addCell(nameColumn2);
         table.addCell(cell2);
+        
+        /*
 
         table.addCell(blankColumn);
         table.addCell(blankColumn);
@@ -426,7 +445,7 @@ public class PDFService {
         table.addCell(underLine);
         table.addCell(underLine);
         table.addCell(underLine);
-        table.addCell(underLine);
+        table.addCell(underLine);*/
 
         return table;
     }
