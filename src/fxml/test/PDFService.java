@@ -279,7 +279,7 @@ public class PDFService {
         PdfPTable headerTable = new PdfPTable(3);
         headerTable.setHorizontalAlignment(Element.ALIGN_LEFT);
         try {
-            headerTable.setTotalWidth(new float[]{57.5f, 545, 176});
+            headerTable.setTotalWidth(new float[]{57.5f, 531.5f, 183f});
             headerTable.setLockedWidth(true);
 
         } catch (DocumentException ex) {
@@ -311,11 +311,11 @@ public class PDFService {
 
         String sessionDateText = ("SESSION:" + session + " EXAMINATION HELD IN: " + date);
 
-        infoTable.addCell(getCellForString(universityText, 0, false, 0, Element.ALIGN_CENTER, font10, true));
-        infoTable.addCell(getCellForString(tabulationText, 0, false, 0, Element.ALIGN_CENTER, font10, false));
-        infoTable.addCell(getCellForString(deptText, 0, false,0, Element.ALIGN_CENTER, font10, false));
-        infoTable.addCell(getCellForString(semesterText, 0, false,0, Element.ALIGN_CENTER, font10, false));
-        infoTable.addCell(getCellForString(sessionDateText, 0, false,0, Element.ALIGN_CENTER, font10, false));
+        infoTable.addCell(getCellForHeaderString(universityText, 0, false, 0, Element.ALIGN_CENTER, font10, true));
+        infoTable.addCell(getCellForHeaderString(tabulationText, 0, false, 0, Element.ALIGN_CENTER, font10, false));
+        infoTable.addCell(getCellForHeaderString(deptText, 0, false,0, Element.ALIGN_CENTER, font10, false));
+        infoTable.addCell(getCellForHeaderString(semesterText, 0, false,0, Element.ALIGN_CENTER, font10, false));
+        infoTable.addCell(getCellForHeaderString(sessionDateText, 0, false,0, Element.ALIGN_CENTER, font10, false));
         //end info table.....
 
         PdfPCell infoCell = new PdfPCell(infoTable);
@@ -325,27 +325,14 @@ public class PDFService {
         PdfPCell resultPublishDateCell = new PdfPCell(new Paragraph("Result Published On............................", new Font(Font.FontFamily.TIMES_ROMAN, 10, Font.BOLD)));
         resultPublishDateCell.setBorder(Rectangle.NO_BORDER);
         resultPublishDateCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-        resultPublishDateCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        resultPublishDateCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
         headerTable.addCell(resultPublishDateCell);
-        headerTable.setSpacingAfter(20); 
+        headerTable.setSpacingAfter(18); 
 
         // System.err.println("completed header table");
         return headerTable;
 
         //end creating header for the document......
-    }
-
-    public PdfPTable createCourseInfo(Course course) {
-
-        PdfPTable courseInfo = new PdfPTable(1);
-        courseInfo.setWidthPercentage(100);
-
-        courseInfo.addCell(getCellForString(course.getSemester(), 0, false, Element.ALIGN_MIDDLE, Element.ALIGN_CENTER, font7, false));
-        courseInfo.addCell(getCellForString(course.getCourseCode(), 0, false, Element.ALIGN_MIDDLE, Element.ALIGN_CENTER, font9, true));
-        courseInfo.addCell(getCellForString(String.valueOf(course.getCredit()), 0, false, Element.ALIGN_MIDDLE, Element.ALIGN_CENTER, font9, false));
-
-        return courseInfo;
-
     }
 
     public PdfPTable createFooter1() {
@@ -516,10 +503,11 @@ public class PDFService {
         }
 
         PdfPCell regCell = getCellForString("Reg No.", 0, true, Element.ALIGN_MIDDLE, Element.ALIGN_CENTER, font9, false);
-        regCell.setPaddingBottom(2.5f);
+        regCell.setPaddingTop(0f);
         table.addCell(regCell);
+        
         PdfPCell nameCell = getNameCell();
-        nameCell.setPaddingBottom(2.5f);
+        nameCell.setPaddingBottom(2f);
         table.addCell(nameCell);
 
         int courseCount = 1;
@@ -528,7 +516,10 @@ public class PDFService {
 
             Course course = (Course) courseList.get(j);
 
-            PdfPCell cell3 = new PdfPCell(createCourseInfo(course));         
+            PdfPCell cell3 = new PdfPCell(createCourseInfo(course)); 
+            cell3.setPaddingTop(1f);
+            cell3.setPaddingBottom(2f);
+            //cell3.setVerticalAlignment(Element.ALIGN_MIDDLE);
             table.addCell(cell3);
 
             if (courseCount == 12) {
@@ -626,7 +617,7 @@ public class PDFService {
         try {
             
             float[] columns=new float[tableSize];
-            float[] mainColumns = new float[]{57.5f, 159.4f, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44};
+            float[] mainColumns = new float[]{57.5f, 159.4f, 44, 44, 44, 44, 44, 44, 44, 44, 44, 32, 32, 32};
             
             
             for(int i=0;i<tableSize;i++){
@@ -640,10 +631,11 @@ public class PDFService {
         }
 
         PdfPCell regCell = getCellForString("Reg No.", 0, true, Element.ALIGN_MIDDLE, Element.ALIGN_CENTER, font9, false);
-        regCell.setPaddingBottom(2.5f);
+        regCell.setPaddingTop(0f);
         table.addCell(regCell);
+        
         PdfPCell nameCell = getNameCell();
-        nameCell.setPaddingBottom(2.5f);
+        nameCell.setPaddingBottom(2f);
         table.addCell(nameCell);
 
         for (int j = courseStart; j < courseList.size(); j++) {
@@ -651,6 +643,8 @@ public class PDFService {
             Course course = (Course) courseList.get(j);
 
             PdfPCell cell3 = new PdfPCell(createCourseInfo(course));
+            cell3.setPaddingTop(1f);
+            cell3.setPaddingBottom(2f);
             table.addCell(cell3);
 
         }
@@ -744,18 +738,6 @@ public class PDFService {
         }
 
         return table;
-    }
-
-    private PdfPTable createSemesterInfo() {
-
-        PdfPTable semesterInfo = new PdfPTable(1);
-        semesterInfo.setWidthPercentage(100);
-
-        semesterInfo.addCell(getCellForString2("Semester=", 0, false));
-        semesterInfo.addCell(getCellForString2("Course No=", 0, false));
-        semesterInfo.addCell(getCellForString2("Credit=", 0, false));
-
-        return semesterInfo;
     }
 
     private PdfPTable createCumulativeTable(int studentStart, boolean flag) {
@@ -875,24 +857,7 @@ public class PDFService {
         return cell;
 
     }
-
-    //this method will return cell where elements will be horizontally right aligned 
-    private PdfPCell getCellForString2(String args, int colSpan, boolean flag) {
-
-        PdfPCell cell = new PdfPCell(new Paragraph(args, font9));
-        if (colSpan != 0) {
-            cell.setColspan(colSpan);
-        }
-        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-        cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
-        if (!flag) {
-            cell.setBorder(Rectangle.NO_BORDER);
-        }
-
-        return cell;
-
-    }
-
+    
     public PdfPCell getCellForString(String args, int colSpan, boolean flag, int vertical, int horizontal, Font font, boolean wrap) {
 
         PdfPCell cell = new PdfPCell(new Paragraph(args, font));
@@ -901,6 +866,24 @@ public class PDFService {
         }
         cell.setVerticalAlignment(vertical);
         cell.setHorizontalAlignment(horizontal);
+        if (!flag) {
+            cell.setBorder(Rectangle.NO_BORDER);
+        }
+        if (wrap) {
+            cell.setNoWrap(true);
+        }
+        return cell;
+    }
+    
+    public PdfPCell getCellForHeaderString(String args, int colSpan, boolean flag, int vertical, int horizontal, Font font, boolean wrap) {
+
+        PdfPCell cell = new PdfPCell(new Paragraph(args, font));
+        if (colSpan != 0) {
+            cell.setColspan(colSpan);
+        }
+        cell.setVerticalAlignment(vertical);
+        cell.setHorizontalAlignment(horizontal);
+        cell.setPaddingTop(1f);
         if (!flag) {
             cell.setBorder(Rectangle.NO_BORDER);
         }
@@ -919,10 +902,14 @@ public class PDFService {
         PdfPCell nameCell = new PdfPCell(new Paragraph("Name", font9));
         nameCell.setBorder(Rectangle.NO_BORDER);
         nameCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        
+        PdfPTable semesterInfo = new PdfPTable(1);
 
-        PdfPTable semesterTable = createSemesterInfo();
+        semesterInfo.addCell(nameCellHelper("Semester="));
+        semesterInfo.addCell(nameCellHelper("Course No="));
+        semesterInfo.addCell(nameCellHelper("Credit="));
 
-        PdfPCell semesterCell = new PdfPCell(semesterTable);
+        PdfPCell semesterCell = new PdfPCell(semesterInfo);
         semesterCell.setBorder(Rectangle.NO_BORDER);
 
         nameTable.addCell(nameCell);
@@ -931,6 +918,31 @@ public class PDFService {
         PdfPCell cell2 = new PdfPCell(nameTable);
 
         return cell2;
+    }
+    private PdfPCell nameCellHelper(String args) {
+
+        PdfPCell cell = new PdfPCell(new Paragraph(args, font9));
+       
+        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        cell.setBorder(Rectangle.NO_BORDER);
+
+        return cell;
+
+    }
+    public PdfPTable createCourseInfo(Course course) {
+
+        PdfPTable courseInfo = new PdfPTable(1);
+        courseInfo.setWidthPercentage(100);
+
+        courseInfo.addCell(getCellForString(course.getSemester(), 0, false, Element.ALIGN_MIDDLE, Element.ALIGN_CENTER, font7, false));
+        PdfPCell cell2 = getCellForString(course.getCourseCode(), 0, false, Element.ALIGN_MIDDLE, Element.ALIGN_CENTER, font9, true);
+        cell2.setPaddingTop(3f);
+        courseInfo.addCell(cell2);
+        courseInfo.addCell(getCellForString(String.valueOf(course.getCredit()), 0, false, Element.ALIGN_MIDDLE, Element.ALIGN_CENTER, font9, false));
+
+        return courseInfo;
+
     }
 
 }

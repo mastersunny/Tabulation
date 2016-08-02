@@ -68,9 +68,9 @@ public class ViewService {
     public void configureFileChooser(final FileChooser fileChooser) {
 
         fileChooser.setTitle("Open Student List");
-        fileChooser.setInitialDirectory(
-                new File(System.getProperty("user.home"))
-        );
+//        fileChooser.setInitialDirectory(
+//                new File(System.getProperty("/Users/sunny/NetBeansProjects/Tabulation"))
+//        );
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("CSV", "*.csv")
         );
@@ -545,8 +545,21 @@ public class ViewService {
     }
 
     private boolean isValadidInputs() {
+        
+        inputs = new ArrayList<>();
+        inputs.add("Department of Computer Science & Engineering");
+        inputs.add("5th SEMESTER");
+        inputs.add("2014");
+        inputs.add("2011-12");
+        inputs.add("October 2014");
+        inputs.add("Md. Eamin Rahman");
+        inputs.add("Md. Mujibur Rahman");
+        inputs.add("Md Masum");
+        inputs.add("Md. Saiful Islam");
+        inputs.add("Husne Ara Chowdhury");
+        inputs.add("Sabir Ismail");
 
-        if (!chairman.getText().isEmpty()
+        /*if (!chairman.getText().isEmpty()
                 && !controller.getText().isEmpty()
                 && !session.getText().isEmpty()
                 && !year.getText().isEmpty()
@@ -555,6 +568,8 @@ public class ViewService {
                 && !member3.getText().isEmpty()
                 && !member4.getText().isEmpty()
                 && !heldIn.getText().isEmpty()) {
+            
+           
             
             inputs = new ArrayList<>();
             
@@ -573,9 +588,9 @@ public class ViewService {
             System.err.println(depts.getValue());
 
             return true;
-        }
+        }*/
 
-        return false;
+        return true;
 
     }
 
