@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -97,7 +98,7 @@ public class PDFService {
 
                                 //start main table body    
                                 int studentStart = studentLoopVariable * 15;
-                                table = createMainTableBody(studentStart, courseStart, table);
+                                table = createMainTableBody(studentStart, courseStart, table, 0);
                                 //end main table body
 
                                 //start document footer
@@ -107,6 +108,7 @@ public class PDFService {
                                 document.add(createFooter2());
                                 document.newPage();
                                 //end document footer
+
                             }
                         }
 
@@ -122,7 +124,7 @@ public class PDFService {
                             if ((courseMod + 3 + 5) <= 12) {
 
                                 document.add(createDocumentHeader());
-                                PdfPTable table = createExtensiontable1(courseStart, studentStart, totalCoureseSize);
+                                PdfPTable table = cumulativeTableHeader(courseStart, studentStart, totalCoureseSize, null);
                                 table.setSpacingAfter(20);
                                 document.add(table);
                                 document.add(createFooter1());
@@ -130,7 +132,7 @@ public class PDFService {
 
                             } else {
 
-                                createExtensiontable2(courseStart, studentStart, totalCoureseSize);
+                                extensiontableBody(courseStart, studentStart, totalCoureseSize, document);
 
                             }
                         }
@@ -401,25 +403,29 @@ public class PDFService {
 
     }
 
-    public PdfPTable createMainTableBody(int studentStart, int courseStart, PdfPTable table) throws DocumentException {
+    public PdfPTable createMainTableBody(int studentStart, int courseStart, PdfPTable table, int count) throws DocumentException {
 
         int studentCount = 1;
         boolean flag = false;
+
+        System.err.println("course: " + courseList.size());
+        System.err.println("table: " + table.getNumberOfColumns());
 
         for (int j = studentStart; j < studentList.size(); j++) {
 
             Student student = (Student) studentList.get(j);
 
-            //column 1
-            table.addCell(getCellForString(student.getRegNo(), 0, true, 0, Element.ALIGN_CENTER, font9, false));
+            PdfPCell regCell = getCellForString(student.getRegNo(), 0, true, Element.ALIGN_MIDDLE, Element.ALIGN_CENTER, font9, false);
+            regCell.setPaddingTop(-0.5f);
 
-            //column 2
-            PdfPCell name = new PdfPCell(new Paragraph(student.getName(), font9));
-            table.addCell(name);
+            PdfPCell nameCell = getCellForString(student.getName(), 0, true, Element.ALIGN_MIDDLE, 0, font9, false);
+            nameCell.setPaddingLeft(5f);
+            nameCell.setPaddingTop(-0.5f);
+
+            table.addCell(regCell);
+            table.addCell(nameCell);
 
             int courseCount = 1;
-            double totalCredit = 0;
-            double totalGpa = 0;
             //rest of the columns
             for (int k = courseStart; k < courseList.size(); k++) {
 
@@ -446,11 +452,7 @@ public class PDFService {
                         cell3.setHorizontalAlignment(Element.ALIGN_CENTER);
                         table.addCell(cell3);
                         flag = true;
-                        //totalCredit += courseReg.getCredit();
-                        // totalGpa += (courseReg.getGpa() * courseReg.getCredit());
-
                         break;
-
                     }
                 }
 
@@ -465,8 +467,47 @@ public class PDFService {
                 courseCount++;
             }
 
-            //student.setTotalCredit(totalCredit);
-            //student.setTotalGpa(totalGpa);
+            if (count != 0) {
+
+                if (count == 1) {
+
+                    PdfPCell creditCell = new PdfPCell(new Paragraph(String.format("%.02f", student.getTotalCredit()), font9));
+                    creditCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                    creditCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                    table.addCell(creditCell);
+                }
+                if (count == 2) {
+
+                    PdfPCell creditCell = new PdfPCell(new Paragraph(String.format("%.02f", student.getTotalCredit()), font9));
+                    creditCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                    creditCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                    table.addCell(creditCell);
+
+                    PdfPCell gpaCell = new PdfPCell(new Paragraph(String.format("%.02f", student.getTotalGpa()), font9));
+                    gpaCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                    gpaCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                    table.addCell(gpaCell);
+                }
+                if (count == 3) {
+
+                    PdfPCell creditCell = new PdfPCell(new Paragraph(String.format("%.02f", student.getTotalCredit()), font9));
+                    creditCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                    creditCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                    table.addCell(creditCell);
+
+                    PdfPCell gpaCell = new PdfPCell(new Paragraph(String.format("%.02f", student.getTotalGpa()), font9));
+                    gpaCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                    gpaCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                    table.addCell(gpaCell);
+
+                    PdfPCell gradeCell = new PdfPCell(new Paragraph(student.getLetterGrade(), font9));
+                    gradeCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                    gradeCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                    table.addCell(gradeCell);
+
+                }
+            }
+
             if (studentCount == 15) {
                 break;
             }
@@ -594,30 +635,38 @@ public class PDFService {
 
     }
 
-    private PdfPTable createExtensiontable1(int courseStart, int studentStart, int totalCoureseSize) {
+    private PdfPTable cumulativeTableHeader(int courseStart, int studentStart, int totalCoureseSize, Stack<String> stack) {
 
-        PdfPTable table = new PdfPTable(totalCoureseSize + 3 + 3 + 2);
-        table.setHorizontalAlignment(Element.ALIGN_LEFT);
-
+        PdfPTable table = null;
+        
         try {
 
-            System.out.println("table size" + table.getNumberOfColumns());
-            float[] columns = new float[table.getNumberOfColumns()];
-            float[] mainColumns = new float[]{57.5f, 159.4f, 44, 44, 44, 44, 44, 44, 44, 44, 44};
-
-            columns[0] = mainColumns[0];
-            columns[1] = mainColumns[1];
+            List<Float> columnsList = new ArrayList<>();
             int i = 0;
-            for (i = 2; i < totalCoureseSize + 2; i++) {
-                columns[i] = mainColumns[i];
-            }
-            columns[i++] = 32;
-            columns[i++] = 32;
-            columns[i++] = 32;
-            columns[i++] = 88;
-            columns[i++] = 66;
-            columns[i++] = 66;
 
+            columnsList.add(57.5f);
+            columnsList.add(159.4f);
+
+            for (i = 2; i < (totalCoureseSize - courseStart) + 2; i++) {
+                columnsList.add(44f);
+            }
+
+            for (i = 0; i < stack.size(); i++) {
+                columnsList.add(32f);
+            }
+
+            columnsList.add(88f);
+            columnsList.add(66f);
+            columnsList.add(66f);
+
+            float[] columns = new float[columnsList.size()];
+
+            for (i = 0; i < columnsList.size(); i++) {
+                columns[i] = columnsList.get(i);
+            }
+
+            table = new PdfPTable(columns.length);
+            table.setHorizontalAlignment(Element.ALIGN_LEFT);
             table.setTotalWidth(columns);
             table.setLockedWidth(true);
 
@@ -633,7 +682,7 @@ public class PDFService {
         nameCell.setPaddingBottom(2f);
         table.addCell(nameCell);
 
-        for (int j = courseStart; j < courseList.size(); j++) {
+        for (int j = courseStart; j < totalCoureseSize; j++) {
 
             Course course = (Course) courseList.get(j);
 
@@ -643,16 +692,24 @@ public class PDFService {
             table.addCell(courseCell);
 
         }
-
-        table.addCell(getCellForString("Total Credit", 0, true, Element.ALIGN_BOTTOM, Element.ALIGN_CENTER, font10, false));
-        table.addCell(getCellForString("Total GPA", 0, true, Element.ALIGN_BOTTOM, Element.ALIGN_CENTER, font10, false));
-        table.addCell(getCellForString("Letter Grade", 0, true, Element.ALIGN_BOTTOM, Element.ALIGN_CENTER, font10, false));
-
-        //start
+        int count = stack.size();
+        while(!stack.isEmpty()){
+            
+            PdfPCell grade = getCellForString(stack.pop(), 0, true, 0, Element.ALIGN_CENTER, font10, false);
+            grade.setPaddingTop(1f);
+            grade.setPaddingBottom(2f);
+            table.addCell(grade);
+        }
+        
+        //start cumulative
         PdfPTable cumulative = new PdfPTable(1);
+        cumulative.setPaddingTop(count);
         cumulative.addCell(getCellForString("Cumulative", 0, false, Element.ALIGN_MIDDLE, Element.ALIGN_CENTER, font10, true));
 
         PdfPTable creditGpaGrade = new PdfPTable(3);
+       
+        creditGpaGrade.setTotalWidth(88f);
+        creditGpaGrade.setLockedWidth(true);
         creditGpaGrade.addCell(getCellForString("Credit", 0, false, Element.ALIGN_MIDDLE, Element.ALIGN_CENTER, font10, true));
         creditGpaGrade.addCell(getCellForString("GPA", 0, false, Element.ALIGN_MIDDLE, Element.ALIGN_CENTER, font10, true));
         creditGpaGrade.addCell(getCellForString("Grade", 0, false, Element.ALIGN_MIDDLE, Element.ALIGN_CENTER, font10, true));
@@ -665,16 +722,16 @@ public class PDFService {
         p.addCell(cell1);
         p.addCell(cell2);
         table.addCell(p);
-        //end
+        //end cumulative
 
         table.addCell(getCellForString("Remarks", 0, true, Element.ALIGN_MIDDLE, Element.ALIGN_CENTER, font9, true));
         table.addCell(getCellForString("GC", 0, true, Element.ALIGN_MIDDLE, Element.ALIGN_CENTER, font9, true));
 
-        createExtensiontable1Body(studentStart, courseStart, table);
+        cumulativeTableBody(studentStart, courseStart, totalCoureseSize, table, count);
         return table;
     }
 
-    private void createExtensiontable1Body(int studentStart, int courseStart, PdfPTable table) {
+    private void cumulativeTableBody(int studentStart, int courseStart, int totalCoureseSize, PdfPTable table, int count) {
 
         int studentCount = 1;
         boolean flag = false;
@@ -693,11 +750,7 @@ public class PDFService {
             table.addCell(regCell);
             table.addCell(nameCell);
 
-            int courseCount = 1;
-            double totalCredit = 0;
-            double totalGpa = 0;
-
-            for (int k = courseStart; k < courseList.size(); k++) {
+            for (int k = courseStart; k < totalCoureseSize; k++) {
 
                 Course course = (Course) courseList.get(k);
 
@@ -734,21 +787,55 @@ public class PDFService {
 
             }
 
-            PdfPCell creditCell = new PdfPCell(new Paragraph(String.format("%.02f", student.getTotalCredit()), font9));
-            creditCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-            creditCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+            PdfPCell creditCell = null;
+            PdfPCell gpaCell = null;
+            PdfPCell gradeCell = null;
+            switch (count) {
 
-            PdfPCell gpaCell = new PdfPCell(new Paragraph(String.format("%.02f", student.getTotalGpa()), font9));
-            gpaCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-            gpaCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                case 1:
+                    
+                    gradeCell = new PdfPCell(new Paragraph(student.getLetterGrade(), font9));
+                    gradeCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                    gradeCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                    break;
 
-            PdfPCell gradeCell = new PdfPCell(new Paragraph(student.getLetterGrade(), font9));
-            gradeCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-            gradeCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                case 2:
+                    
+                    gpaCell = new PdfPCell(new Paragraph(String.format("%.02f", student.getTotalGpa()), font9));
+                    gpaCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                    gpaCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                    
+                    gradeCell = new PdfPCell(new Paragraph(student.getLetterGrade(), font9));
+                    gradeCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                    gradeCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                    break;
 
-            table.addCell(creditCell);
-            table.addCell(gpaCell);
-            table.addCell(gradeCell);
+                case 3:
+                    creditCell = new PdfPCell(new Paragraph(String.format("%.02f", student.getTotalCredit()), font9));
+                    creditCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                    creditCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+                    gpaCell = new PdfPCell(new Paragraph(String.format("%.02f", student.getTotalGpa()), font9));
+                    gpaCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                    gpaCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                    
+                    gradeCell = new PdfPCell(new Paragraph(student.getLetterGrade(), font9));
+                    gradeCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                    gradeCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                    break;
+
+                    
+
+            }
+            if (creditCell != null) {
+                table.addCell(creditCell);
+            }
+            if (gpaCell != null) {
+                table.addCell(gpaCell);
+            }
+            if (gradeCell != null) {
+                table.addCell(gradeCell);
+            }
 
             PdfPTable table1 = new PdfPTable(3);
             table1.setTotalWidth(88f);
@@ -764,8 +851,8 @@ public class PDFService {
             cell2.setPaddingTop(0f);
             cell2.setPaddingBottom(0f);
             table.addCell(cell2);
-            table.addCell(new Paragraph(""));
-            table.addCell(new Paragraph(""));
+            table.addCell(new Paragraph("cc"));
+            table.addCell(new Paragraph("ss"));
 
             if (studentCount == 15) {
                 break;
@@ -774,13 +861,14 @@ public class PDFService {
         }
     }
 
-    private void createExtensiontable2(int courseStart, int studentStart, int totalCoureseSize) {
+    private void extensiontableBody(int courseStart, int studentStart, int totalCoureseSize, Document document) throws DocumentException, IOException {
 
         PdfPTable table = null;
-        List<String> list = new ArrayList<>();
-        list.add("Total Credit");
-        list.add("Total GPA");
-        list.add("Letter Grade");
+         
+        Stack<String> stack = new Stack<>();
+        stack.push("Letter Grade");
+        stack.push("Total GPA");
+        stack.push("Total Credit");
 
         int colCount = 0;
         try {
@@ -792,14 +880,15 @@ public class PDFService {
             columnsList.add(159.4f);
 
             for (i = 2; i < (totalCoureseSize - courseStart) + 2; i++) {
-        
+
                 colCount++;
                 columnsList.add(44f);
             }
-            for (String s : list) {
-               
-                if(colCount==12)
+            for (String s : stack) {
+
+                if (colCount == 12) {
                     break;
+                }
                 columnsList.add(32f);
                 colCount++;
             }
@@ -827,7 +916,8 @@ public class PDFService {
         nameCell.setPaddingBottom(2f);
         table.addCell(nameCell);
 
-        int j =0;
+        int j = 0;
+        colCount = 0;
         for (j = courseStart; j < courseList.size(); j++) {
 
             Course course = (Course) courseList.get(j);
@@ -836,26 +926,39 @@ public class PDFService {
             courseCell.setPaddingTop(1f);
             courseCell.setPaddingBottom(2f);
             table.addCell(courseCell);
+            colCount++;
 
         }
 
-        int k =0;
-        for (k = 0; k < 3; k++) {
+        while(!stack.isEmpty()){
             
-            PdfPCell grade = getCellForString(list.get(k), 0, false, Element.ALIGN_MIDDLE, Element.ALIGN_CENTER, font10, true);
+            if (colCount == 12) {
+                break;
+            }
+            
+            PdfPCell grade = getCellForString(stack.pop(), 0, true, 0, Element.ALIGN_CENTER, font10, false);
             grade.setPaddingTop(1f);
             grade.setPaddingBottom(2f);
             table.addCell(grade);
-            
-            if((j+k)==colCount)
-                break;
-
+            colCount++;
+                   
         }
-        
-        
-        System.err.println(table.getNumberOfColumns());
+       
 
-        
+        createMainTableBody(studentStart, courseStart, table, (3-stack.size()));
+
+        document.add(createDocumentHeader());
+        document.add(table);
+        document.add(createFooter1());
+        document.add(createFooter2());
+        document.newPage();
+
+        PdfPTable cumutable = cumulativeTableHeader(totalCoureseSize, studentStart, totalCoureseSize, stack);
+        document.add(createDocumentHeader());
+        document.add(cumutable);
+        document.add(createFooter1());
+        document.add(createFooter2());
+        document.newPage();
     }
 
 }
