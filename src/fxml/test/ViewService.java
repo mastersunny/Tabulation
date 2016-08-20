@@ -5,9 +5,6 @@
  */
 package fxml.test;
 
-import com.opencsv.CSVReader;
-import com.opencsv.bean.ColumnPositionMappingStrategy;
-import com.opencsv.bean.CsvToBean;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -25,7 +22,6 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
@@ -33,6 +29,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
@@ -47,8 +44,8 @@ public class ViewService {
 
     private Stage window;
     private FileChooser fileChooser;
-    List<Student> studentList = new ArrayList<>();
-    List<Course> courseList = new ArrayList<>();
+    List<Student> studentList;
+    List<Course> courseList;
     List<String> inputs;
     BorderPane mainLayout;
     private ComboBox<String> depts;
@@ -76,31 +73,75 @@ public class ViewService {
         );
     }
 
-    public void openFileForCourse(File file,BorderPane mainLayout, MenuItem exportAsPDF) {
+    public void openFileForCourse(File file, BorderPane mainLayout, MenuItem exportAsPDF) {
+
+        this.mainLayout = mainLayout;
+        this.exportAsPDF = exportAsPDF;
+
+        courseList = new ArrayList<>();
+        studentList = new ArrayList<>();
+
+        BufferedReader br = null;
+        String csvSplitBy = ",";
+        String courseCode = null;
+        String semester = null;
+        String credit = null;
+        String line = null;
 
         try {
 
-            this.mainLayout = mainLayout;
-            this.exportAsPDF = exportAsPDF;
+            br = new BufferedReader(new FileReader(file));
 
-            courseList.removeAll(courseList);
-            studentList.removeAll(studentList);
+            while ((line = br.readLine()) != null) {
 
-            CSVReader reader = new CSVReader(new FileReader(file), ',');
-            ColumnPositionMappingStrategy strat = new ColumnPositionMappingStrategy();
-            strat.setType(Course.class);
-            String[] columns = new String[]{"courseCode", "semester", "credit"};
-            strat.setColumnMapping(columns);
-            CsvToBean csv = new CsvToBean();
-            List courseList = csv.parse(strat, reader);
+                if (line == null && line.length() == 0) {
+                    continue;
+                }
 
-            showCourseList(courseList);
+                Course course = new Course();
+
+                String array[] = line.split(csvSplitBy);
+                courseCode = array[0].trim();
+                semester = array[1].trim();
+                credit = array[2].trim();
+
+                course.setCourseCode(courseCode);
+                course.setSemester(semester);
+                course.setCredit(Double.valueOf(credit));
+
+                this.courseList.add(course);
+
+            }
+
+//            CSVReader reader = new CSVReader(new FileReader(file), ',');
+//            ColumnPositionMappingStrategy strat = new ColumnPositionMappingStrategy();
+//            strat.setType(Course.class);
+//            String[] columns = new String[]{"courseCode", "semester", "credit"};
+//            strat.setColumnMapping(columns);
+//            CsvToBean csv = new CsvToBean();
+//            List courseList = csv.parse(strat, reader);
+            if (this.courseList != null && !this.courseList.isEmpty()) {
+                showCourseList();
+            }
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
         } catch (IOException ex) {
-            Logger.getLogger(ViewService.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ViewService.class.getName()).log(
+                    Level.SEVERE, null, ex
+            );
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
-    public void showCourseList(List courseList) {
+    public void showCourseList() {
 
         fileChooser = new FileChooser();
 
@@ -114,10 +155,8 @@ public class ViewService {
         int rowCount = 0;
 
         Collections.sort(courseList);
-        for (Object course : courseList) {
 
-            Course c = (Course) course;
-            this.courseList.add(c);
+        for (Course course : courseList) {
 
             if (rowCount == 5) {
 
@@ -126,11 +165,11 @@ public class ViewService {
                 rowCount = 0;
             }
 
-            Label label = new Label(c.getCourseCode());
+            Label label = new Label(course.getCourseCode());
             GridPane.setConstraints(label, column, row);
 
             String s = "";
-            s += c.getCourseCode() + " " + c.getCredit();
+            s += course.getCourseCode() + " " + course.getCredit();
             Button button = new Button("Browse");
             button.setId(s);
 
@@ -214,15 +253,14 @@ public class ViewService {
 
                 createTabulationView();
 
-                PDFService pDFService = new PDFService(studentList, courseList,inputs);
-                
+                PDFService pDFService = new PDFService(studentList, courseList, inputs);
 
                 exportAsPDF.setVisible(true);
 
                 exportAsPDF.setOnAction(et -> {
 
                     if (studentList.size() != 0 && isValadidInputs()) {
-                        
+
                         pDFService.generatePdf();
                         AlertMessage.showAlertMessage(Alert.AlertType.CONFIRMATION, "PDF Created Successfully!");
                     } else {
@@ -245,7 +283,8 @@ public class ViewService {
         ScrollPane sp2 = new ScrollPane();
         sp2.setContent(inputGrid);
 
-        vBox.getChildren().addAll(sp, sp2);
+        Region region = new Region();
+        vBox.getChildren().addAll(sp, region, sp2);
 
         mainLayout.setCenter(vBox);
 
@@ -316,7 +355,7 @@ public class ViewService {
 
                     student = new Student(regNo);
                     student.setName(name);
-                    studentList.add(student);
+                    this.studentList.add(student);
 
                 }
 
@@ -370,8 +409,8 @@ public class ViewService {
         Label university = new Label("SHAHJALAL UNIVERSITY OF SCIENCE & TECHNOLOGY SYLHET, BANGLADESH");
         Label tabulation = new Label("TABULATION SHEET");
         Label department = new Label(inputs.get(0));
-        Label semester = new Label("B.Sc (Engg.) "+inputs.get(1)+" EXAMINATION "+inputs.get(2));
-        Label session = new Label("SESSION:"+inputs.get(3)+" EXAMINATION HELD IN: "+inputs.get(4));
+        Label semester = new Label("B.Sc (Engg.) " + inputs.get(1) + " EXAMINATION " + inputs.get(2));
+        Label session = new Label("SESSION:" + inputs.get(3) + " EXAMINATION HELD IN: " + inputs.get(4));
         Label date = new Label("Result Published On.....................");
 
         vBox.getChildren().addAll(university, tabulation, department, semester, session, date);
@@ -391,19 +430,22 @@ public class ViewService {
 
         //start semester info
         HBox hBox2 = new HBox();
-        hBox2.setSpacing(60);
-        Label name = new Label("\nName");
-        name.setTextAlignment(TextAlignment.LEFT);
-        VBox vBox2 = new VBox();
-        vBox2.setAlignment(Pos.CENTER_RIGHT);
-        vBox2.setSpacing(3);
-        vBox2.getChildren().addAll(new Label("Semester="), new Label("Course No="), new Label(" Credit="));
-        hBox2.getChildren().addAll(name, vBox2);
+        hBox2.setSpacing(100);
 
+        VBox nameBox = new VBox();
+        nameBox.setAlignment(Pos.CENTER_RIGHT);
+        nameBox.setSpacing(3);
+        nameBox.getChildren().addAll(new Label(" "), new Label("Name"), new Label(""));
+
+        VBox semesterBox = new VBox();
+        semesterBox.setAlignment(Pos.CENTER_RIGHT);
+        semesterBox.setSpacing(3);
+        semesterBox.getChildren().addAll(new Label("Semester="), new Label("Course No="), new Label("Credit="));
+
+        hBox2.getChildren().addAll(nameBox, semesterBox);
         grid.add(hBox2, 1, 0);
 
         //end semester info
-        
         int row = 0;
         int col = 2;
 
@@ -412,18 +454,19 @@ public class ViewService {
 
         for (Course course : courseList) {
 
-            VBox vBox3 = new VBox();
-            vBox3.setSpacing(3);
-            vBox3.setPadding(new Insets(5, 5, 5, 5));
+            VBox courseBox = new VBox();
+            courseBox.setSpacing(4);
+            courseBox.setPadding(new Insets(5, 5, 5, 5));
+
             Label semesterLabel = new Label(course.getSemester());
             semesterLabel.setStyle("-fx-font-size:10;");
             Label courseCode = new Label(course.getCourseCode());
-            Label credit = new Label(String.valueOf(course.getCredit()));
+            Label credit = new Label(String.format("%.02f", course.getCredit()));
 
-            vBox3.getChildren().addAll(semesterLabel, courseCode, credit);
+            courseBox.getChildren().addAll(semesterLabel, courseCode, credit);
 
-            vBox3.setAlignment(Pos.CENTER);
-            grid.add(vBox3, col++, row);
+            courseBox.setAlignment(Pos.CENTER);
+            grid.add(courseBox, col++, row);
 
         }
         Label totalCreditLabel = new Label("Total Credit");
@@ -449,6 +492,8 @@ public class ViewService {
             grid.add(regLabel, 0, row);
 
             Label nameLabel = new Label(student.getName());
+            nameLabel.setMaxWidth(250);
+            nameLabel.setWrapText(true);
             nameLabel.setTextAlignment(TextAlignment.CENTER);
             nameLabel.setPadding(new Insets(5, 5, 5, 5));
             grid.add(nameLabel, 1, row);
@@ -464,8 +509,13 @@ public class ViewService {
 
                     if (course.getCourseCode().equalsIgnoreCase(courseReg.getCourseCode())) {
 
-                        Label grade = new Label(String.valueOf(courseReg.getGpa()) + " " + courseReg.getLetterGrade());
-                        grid.add(grade, col++, row);
+                        HBox gpaLetterGrade = new HBox();
+                        gpaLetterGrade.setSpacing(20);
+                        gpaLetterGrade.setPadding(new Insets(5, 5, 5, 5));
+                        gpaLetterGrade.setAlignment(Pos.CENTER_LEFT);
+                        gpaLetterGrade.getChildren().addAll(new Label(String.format("%.02f", courseReg.getGpa())), new Label(courseReg.getLetterGrade()));
+
+                        grid.add(gpaLetterGrade, col++, row);
                         flag = true;
 
                         if (courseReg.getGpa() != 0) {
@@ -487,11 +537,20 @@ public class ViewService {
 
             if (totalCredit != 0) {
 
-                String format = String.format("%.02f", (totalGpa / totalCredit));
-                System.err.println(format);
-                grid.add(new Label(String.valueOf(totalCredit)), col++, row);
-                grid.add(new Label(format), col++, row);
-                grid.add(new Label(CgpaCalculator.getLetterGrade(totalGpa / totalCredit)), col++, row);
+                Label creditLabel = new Label(String.format("%.02f", totalCredit));
+                creditLabel.setPadding(new Insets(5, 5, 5, 5));
+                creditLabel.setTextAlignment(TextAlignment.CENTER);
+                grid.add(creditLabel, col++, row);
+
+                Label gpaLabel = new Label(String.format("%.02f", (totalGpa / totalCredit)));
+                gpaLabel.setPadding(new Insets(5, 5, 5, 5));
+                gpaLabel.setTextAlignment(TextAlignment.CENTER);
+                grid.add(gpaLabel, col++, row);
+
+                Label letterLabel = new Label(CgpaCalculator.getLetterGrade(totalGpa / totalCredit));
+                letterLabel.setPadding(new Insets(5, 5, 5, 5));
+                letterLabel.setTextAlignment(TextAlignment.CENTER);
+                grid.add(letterLabel, col++, row);
 
                 student.setTotalCredit(totalCredit);
                 student.setTotalGpa(totalGpa / totalCredit);
@@ -510,42 +569,40 @@ public class ViewService {
         }
 
         borderPane.setCenter(sp);
-        
-        StackPane pane =new StackPane();
+
+        StackPane pane = new StackPane();
         GridPane footergrid = new GridPane();
+
         footergrid.setAlignment(Pos.CENTER);
         footergrid.setVgap(5);
         footergrid.setHgap(20);
         pane.getChildren().add(footergrid);
-        
+
         footergrid.add(new Label("Chairman: "), 0, 0);
-     
+
         footergrid.add(new Label(inputs.get(5)), 1, 0);
-        
+
         footergrid.add(new Label("Controller: "), 3, 0);
-     
+
         footergrid.add(new Label(inputs.get(6)), 4, 0);
-        
+
         footergrid.add(new Label(" "), 0, 1);
-     
+
         footergrid.add(new Label("Members: "), 0, 2);
         footergrid.add(new Label(inputs.get(7)), 1, 2);
         footergrid.add(new Label(inputs.get(8)), 2, 2);
         footergrid.add(new Label(inputs.get(9)), 3, 2);
         footergrid.add(new Label(inputs.get(10)), 4, 2);
-        
+
         borderPane.setBottom(pane);
 
         mainLayout.setCenter(borderPane);
         mainLayout.setRight(new Label(""));
-       
-        
-        
 
     }
 
     private boolean isValadidInputs() {
-        
+
         inputs = new ArrayList<>();
         inputs.add("Department of Computer Science & Engineering");
         inputs.add("5th SEMESTER");
@@ -560,36 +617,35 @@ public class ViewService {
         inputs.add("Sabir Ismail");
 
         /*if (!chairman.getText().isEmpty()
-                && !controller.getText().isEmpty()
-                && !session.getText().isEmpty()
-                && !year.getText().isEmpty()
-                && !member1.getText().isEmpty()
-                && !member2.getText().isEmpty()
-                && !member3.getText().isEmpty()
-                && !member4.getText().isEmpty()
-                && !heldIn.getText().isEmpty()) {
+         && !controller.getText().isEmpty()
+         && !session.getText().isEmpty()
+         && !year.getText().isEmpty()
+         && !member1.getText().isEmpty()
+         && !member2.getText().isEmpty()
+         && !member3.getText().isEmpty()
+         && !member4.getText().isEmpty()
+         && !heldIn.getText().isEmpty()) {
             
            
             
-            inputs = new ArrayList<>();
+         inputs = new ArrayList<>();
             
-            inputs.add(depts.getValue());
-            inputs.add(semesters.getValue());
-            inputs.add(year.getText());
-            inputs.add(session.getText());
-            inputs.add(heldIn.getText());
-            inputs.add(chairman.getText());
-            inputs.add(controller.getText());
-            inputs.add(member1.getText());
-            inputs.add(member2.getText());
-            inputs.add(member3.getText());
-            inputs.add(member4.getText());
+         inputs.add(depts.getValue());
+         inputs.add(semesters.getValue());
+         inputs.add(year.getText());
+         inputs.add(session.getText());
+         inputs.add(heldIn.getText());
+         inputs.add(chairman.getText());
+         inputs.add(controller.getText());
+         inputs.add(member1.getText());
+         inputs.add(member2.getText());
+         inputs.add(member3.getText());
+         inputs.add(member4.getText());
             
-            System.err.println(depts.getValue());
+         System.err.println(depts.getValue());
 
-            return true;
-        }*/
-
+         return true;
+         }*/
         return true;
 
     }

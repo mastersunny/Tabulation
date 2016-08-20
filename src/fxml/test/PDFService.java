@@ -112,30 +112,29 @@ public class PDFService {
                             }
                         }
 
-                        if (totalCoureseSize % 12 > 0) {
+                        int courseStart = courseLoopVariable * 12;
+                        int studentStart = studentLoopVariable * 15;
+                        int courseMod = totalCoureseSize % 12;
 
-                            boolean flag = false;
-                            int tableSize = 0;
+                        if ((courseMod + 3 + 5) <= 12) {
 
-                            int courseStart = courseLoopVariable * 12;
-                            int studentStart = studentLoopVariable * 15;
-                            int courseMod = totalCoureseSize % 12;
+                            Stack<String> stack = new Stack<>();
+                            stack.push("Letter Grade");
+                            stack.push("Total GPA");
+                            stack.push("Total Credit");
+                            document.add(createDocumentHeader());
+                            PdfPTable table = cumulativeTableHeader(courseStart, studentStart, totalCoureseSize, stack);
+                            table.setSpacingAfter(20);
+                            document.add(table);
+                            document.add(createFooter1());
+                            document.add(createFooter2());
 
-                            if ((courseMod + 3 + 5) <= 12) {
+                        } else {
 
-                                document.add(createDocumentHeader());
-                                PdfPTable table = cumulativeTableHeader(courseStart, studentStart, totalCoureseSize, null);
-                                table.setSpacingAfter(20);
-                                document.add(table);
-                                document.add(createFooter1());
-                                document.add(createFooter2());
+                            extensiontableBody(courseStart, studentStart, totalCoureseSize, document);
 
-                            } else {
-
-                                extensiontableBody(courseStart, studentStart, totalCoureseSize, document);
-
-                            }
                         }
+
                     }
                 }
             }
@@ -440,9 +439,11 @@ public class PDFService {
                         PdfPTable gpaLetterGrade = new PdfPTable(2);
 
                         PdfPCell cell1 = new PdfPCell(new Paragraph(String.format("%.02f", courseReg.getGpa()), font9));
+                        cell1.setPaddingTop(-0.5f);
                         cell1.setBorder(Rectangle.NO_BORDER);
                         cell1.setHorizontalAlignment(Element.ALIGN_CENTER);
                         PdfPCell cell2 = new PdfPCell(new Paragraph(courseReg.getLetterGrade(), font9));
+                        cell2.setPaddingTop(-0.5f);
                         cell2.setBorder(Rectangle.NO_BORDER);
                         cell2.setHorizontalAlignment(Element.ALIGN_CENTER);
                         gpaLetterGrade.addCell(cell1);
@@ -450,6 +451,8 @@ public class PDFService {
 
                         PdfPCell cell3 = new PdfPCell(gpaLetterGrade);
                         cell3.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        cell3.setVerticalAlignment(Element.ALIGN_MIDDLE);
+      
                         table.addCell(cell3);
                         flag = true;
                         break;
@@ -471,38 +474,44 @@ public class PDFService {
 
                 if (count == 1) {
 
-                    PdfPCell creditCell = new PdfPCell(new Paragraph(String.format("%.02f", student.getTotalCredit()), font9));
+                    PdfPCell creditCell = new PdfPCell(new Paragraph(String.valueOf(student.getTotalCredit()), font9));
                     creditCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
                     creditCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                    creditCell.setPaddingTop(-0.5f);
                     table.addCell(creditCell);
                 }
                 if (count == 2) {
 
-                    PdfPCell creditCell = new PdfPCell(new Paragraph(String.format("%.02f", student.getTotalCredit()), font9));
+                    PdfPCell creditCell = new PdfPCell(new Paragraph(String.valueOf(student.getTotalCredit()), font9));
                     creditCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
                     creditCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                    creditCell.setPaddingTop(-0.5f);
                     table.addCell(creditCell);
 
                     PdfPCell gpaCell = new PdfPCell(new Paragraph(String.format("%.02f", student.getTotalGpa()), font9));
                     gpaCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
                     gpaCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                    gpaCell.setPaddingTop(-0.5f);
                     table.addCell(gpaCell);
                 }
                 if (count == 3) {
 
-                    PdfPCell creditCell = new PdfPCell(new Paragraph(String.format("%.02f", student.getTotalCredit()), font9));
+                    PdfPCell creditCell = new PdfPCell(new Paragraph(String.valueOf(student.getTotalCredit()), font9));
                     creditCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
                     creditCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                    creditCell.setPaddingTop(-0.5f);
                     table.addCell(creditCell);
 
                     PdfPCell gpaCell = new PdfPCell(new Paragraph(String.format("%.02f", student.getTotalGpa()), font9));
                     gpaCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
                     gpaCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                    gpaCell.setPaddingTop(-0.5f);
                     table.addCell(gpaCell);
 
                     PdfPCell gradeCell = new PdfPCell(new Paragraph(student.getLetterGrade(), font9));
                     gradeCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
                     gradeCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                    gradeCell.setPaddingTop(-0.5f);
                     table.addCell(gradeCell);
 
                 }
@@ -592,7 +601,6 @@ public class PDFService {
         nameCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
 
         PdfPTable semesterInfo = new PdfPTable(1);
-
         semesterInfo.addCell(nameCellHelper("Semester="));
         semesterInfo.addCell(nameCellHelper("Course No="));
         semesterInfo.addCell(nameCellHelper("Credit="));
@@ -603,19 +611,17 @@ public class PDFService {
         nameTable.addCell(nameCell);
         nameTable.addCell(semesterCell);
 
-        PdfPCell cell2 = new PdfPCell(nameTable);
-
-        return cell2;
+        PdfPCell cell = new PdfPCell(nameTable);
+        
+        return cell;
     }
 
     private PdfPCell nameCellHelper(String args) {
 
         PdfPCell cell = new PdfPCell(new Paragraph(args, font9));
-
-        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
         cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
         cell.setBorder(Rectangle.NO_BORDER);
-
+        cell.setPaddingBottom(2.5f);
         return cell;
 
     }
@@ -625,11 +631,13 @@ public class PDFService {
         PdfPTable courseInfo = new PdfPTable(1);
         courseInfo.setWidthPercentage(100);
 
-        courseInfo.addCell(getCellForString(course.getSemester(), 0, false, Element.ALIGN_MIDDLE, Element.ALIGN_CENTER, font7, false));
-        PdfPCell cell2 = getCellForString(course.getCourseCode(), 0, false, Element.ALIGN_MIDDLE, Element.ALIGN_CENTER, font9, true);
-        cell2.setPaddingTop(3f);
+        courseInfo.addCell(getCellForString(course.getSemester(), Element.ALIGN_MIDDLE, false, 0, Element.ALIGN_CENTER, font7, false));
+        
+        PdfPCell cell2 = getCellForString(course.getCourseCode(), Element.ALIGN_MIDDLE, false, 0, Element.ALIGN_CENTER, font9, true);
+        cell2.setPaddingBottom(2.5f);
+        cell2.setPaddingTop(3.4f);
         courseInfo.addCell(cell2);
-        courseInfo.addCell(getCellForString(String.valueOf(course.getCredit()), 0, false, Element.ALIGN_MIDDLE, Element.ALIGN_CENTER, font9, false));
+        courseInfo.addCell(getCellForString(String.format("%.02f",course.getCredit()), 0, false, Element.ALIGN_MIDDLE, Element.ALIGN_CENTER, font9, false));
 
         return courseInfo;
 
@@ -638,7 +646,7 @@ public class PDFService {
     private PdfPTable cumulativeTableHeader(int courseStart, int studentStart, int totalCoureseSize, Stack<String> stack) {
 
         PdfPTable table = null;
-        
+
         try {
 
             List<Float> columnsList = new ArrayList<>();
@@ -651,8 +659,10 @@ public class PDFService {
                 columnsList.add(44f);
             }
 
-            for (i = 0; i < stack.size(); i++) {
-                columnsList.add(32f);
+            if (stack != null && stack.size() != 0) {
+                for (i = 0; i < stack.size(); i++) {
+                    columnsList.add(30f);
+                }
             }
 
             columnsList.add(88f);
@@ -693,21 +703,32 @@ public class PDFService {
 
         }
         int count = stack.size();
-        while(!stack.isEmpty()){
+        while (!stack.isEmpty()) {
+
+            String s[] = stack.pop().split(" ");
             
-            PdfPCell grade = getCellForString(stack.pop(), 0, true, 0, Element.ALIGN_CENTER, font10, false);
-            grade.setPaddingTop(1f);
-            grade.setPaddingBottom(2f);
+            PdfPTable totalCredit = new PdfPTable(1);
+            totalCredit.setSpacingBefore(12.5f);
+            totalCredit.setWidthPercentage(100);
+            totalCredit.getDefaultCell().setBorder(Rectangle.NO_BORDER);
+            
+            PdfPCell cell1 = getCellForString(s[0], 0, false, 0, Element.ALIGN_CENTER, new Font(Font.FontFamily.TIMES_ROMAN, 10f), false);
+            PdfPCell cell2 = getCellForString(s[1], 0, false, 0, Element.ALIGN_CENTER, new Font(Font.FontFamily.TIMES_ROMAN, 10f), false);
+                 
+            totalCredit.addCell(cell1);
+            totalCredit.addCell(cell2);
+            
+            PdfPCell grade = new PdfPCell(totalCredit);
             table.addCell(grade);
         }
-        
+
         //start cumulative
         PdfPTable cumulative = new PdfPTable(1);
         cumulative.setPaddingTop(count);
         cumulative.addCell(getCellForString("Cumulative", 0, false, Element.ALIGN_MIDDLE, Element.ALIGN_CENTER, font10, true));
 
         PdfPTable creditGpaGrade = new PdfPTable(3);
-       
+
         creditGpaGrade.setTotalWidth(88f);
         creditGpaGrade.setLockedWidth(true);
         creditGpaGrade.addCell(getCellForString("Credit", 0, false, Element.ALIGN_MIDDLE, Element.ALIGN_CENTER, font10, true));
@@ -716,6 +737,7 @@ public class PDFService {
 
         PdfPTable p = new PdfPTable(1);
         PdfPCell cell1 = new PdfPCell(cumulative);
+        cell1.setPaddingBottom(3f);
         cell1.setBorder(Rectangle.NO_BORDER);
         PdfPCell cell2 = new PdfPCell(creditGpaGrade);
         cell2.setBorder(Rectangle.NO_BORDER);
@@ -763,16 +785,22 @@ public class PDFService {
                         PdfPTable gpaLetterGrade = new PdfPTable(2);
 
                         PdfPCell cell1 = new PdfPCell(new Paragraph(String.format("%.02f", courseReg.getGpa()), font9));
+                        cell1.setPaddingTop(-0.5f);
                         cell1.setBorder(Rectangle.NO_BORDER);
                         cell1.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        
                         PdfPCell cell2 = new PdfPCell(new Paragraph(courseReg.getLetterGrade(), font9));
+                        cell2.setPaddingTop(-0.5f);
                         cell2.setBorder(Rectangle.NO_BORDER);
                         cell2.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        
                         gpaLetterGrade.addCell(cell1);
                         gpaLetterGrade.addCell(cell2);
 
                         PdfPCell cell3 = new PdfPCell(gpaLetterGrade);
                         cell3.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        cell3.setVerticalAlignment(Element.ALIGN_MIDDLE);
+      
                         table.addCell(cell3);
                         flag = true;
                         break;
@@ -793,38 +821,42 @@ public class PDFService {
             switch (count) {
 
                 case 1:
-                    
+
                     gradeCell = new PdfPCell(new Paragraph(student.getLetterGrade(), font9));
                     gradeCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
                     gradeCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                    gradeCell.setPaddingTop(-0.5f);
                     break;
 
                 case 2:
-                    
+
                     gpaCell = new PdfPCell(new Paragraph(String.format("%.02f", student.getTotalGpa()), font9));
                     gpaCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
                     gpaCell.setHorizontalAlignment(Element.ALIGN_CENTER);
-                    
+                    gpaCell.setPaddingTop(-0.5f);
+
                     gradeCell = new PdfPCell(new Paragraph(student.getLetterGrade(), font9));
                     gradeCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
                     gradeCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                    gradeCell.setPaddingTop(-0.5f);
                     break;
 
                 case 3:
-                    creditCell = new PdfPCell(new Paragraph(String.format("%.02f", student.getTotalCredit()), font9));
+                    creditCell = new PdfPCell(new Paragraph(String.valueOf(student.getTotalCredit()), font9));
                     creditCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
                     creditCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                    creditCell.setPaddingTop(-0.5f);
 
                     gpaCell = new PdfPCell(new Paragraph(String.format("%.02f", student.getTotalGpa()), font9));
                     gpaCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
                     gpaCell.setHorizontalAlignment(Element.ALIGN_CENTER);
-                    
+                    gpaCell.setPaddingTop(-0.5f);
+
                     gradeCell = new PdfPCell(new Paragraph(student.getLetterGrade(), font9));
                     gradeCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
                     gradeCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                    gradeCell.setPaddingTop(-0.5f);
                     break;
-
-                    
 
             }
             if (creditCell != null) {
@@ -864,7 +896,7 @@ public class PDFService {
     private void extensiontableBody(int courseStart, int studentStart, int totalCoureseSize, Document document) throws DocumentException, IOException {
 
         PdfPTable table = null;
-         
+
         Stack<String> stack = new Stack<>();
         stack.push("Letter Grade");
         stack.push("Total GPA");
@@ -889,7 +921,7 @@ public class PDFService {
                 if (colCount == 12) {
                     break;
                 }
-                columnsList.add(32f);
+                columnsList.add(30f);
                 colCount++;
             }
 
@@ -930,24 +962,35 @@ public class PDFService {
 
         }
 
-        while(!stack.isEmpty()){
-            
+        while (!stack.isEmpty()) {
+
             if (colCount == 12) {
                 break;
             }
             
-            PdfPCell grade = getCellForString(stack.pop(), 0, true, 0, Element.ALIGN_CENTER, font10, false);
-            grade.setPaddingTop(1f);
-            grade.setPaddingBottom(2f);
+            String s[] = stack.pop().split(" ");
+            
+            PdfPTable totalCredit = new PdfPTable(1);
+            totalCredit.setSpacingBefore(12.5f);
+            totalCredit.setWidthPercentage(100);
+            totalCredit.getDefaultCell().setBorder(Rectangle.NO_BORDER);
+            
+            PdfPCell cell1 = getCellForString(s[0], 0, false, 0, Element.ALIGN_CENTER, new Font(Font.FontFamily.TIMES_ROMAN, 10f), false);
+            PdfPCell cell2 = getCellForString(s[1], 0, false, 0, Element.ALIGN_CENTER, new Font(Font.FontFamily.TIMES_ROMAN, 10f), false);
+                 
+            totalCredit.addCell(cell1);
+            totalCredit.addCell(cell2);
+            
+            PdfPCell grade = new PdfPCell(totalCredit);
             table.addCell(grade);
             colCount++;
-                   
-        }
-       
 
-        createMainTableBody(studentStart, courseStart, table, (3-stack.size()));
+        }
+
+        createMainTableBody(studentStart, courseStart, table, (3 - stack.size()));
 
         document.add(createDocumentHeader());
+        table.setSpacingAfter(20);
         document.add(table);
         document.add(createFooter1());
         document.add(createFooter2());
@@ -955,6 +998,7 @@ public class PDFService {
 
         PdfPTable cumutable = cumulativeTableHeader(totalCoureseSize, studentStart, totalCoureseSize, stack);
         document.add(createDocumentHeader());
+        cumutable.setSpacingAfter(20);
         document.add(cumutable);
         document.add(createFooter1());
         document.add(createFooter2());
