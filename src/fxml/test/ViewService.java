@@ -578,21 +578,22 @@ public class ViewService {
         footergrid.setHgap(20);
         pane.getChildren().add(footergrid);
 
-        footergrid.add(new Label("Chairman: "), 0, 0);
+        footergrid.add(new Label(""), 0, 0);
+        footergrid.add(new Label("Chairman: "), 0, 1);
 
-        footergrid.add(new Label(inputs.get(5)), 1, 0);
+        footergrid.add(new Label(inputs.get(5)), 1, 1);
 
-        footergrid.add(new Label("Controller: "), 3, 0);
+        footergrid.add(new Label("Controller: "), 3, 1);
 
-        footergrid.add(new Label(inputs.get(6)), 4, 0);
+        footergrid.add(new Label(inputs.get(6)), 4, 1);
 
-        footergrid.add(new Label(" "), 0, 1);
+        footergrid.add(new Label(" "), 0, 2);
 
-        footergrid.add(new Label("Members: "), 0, 2);
-        footergrid.add(new Label(inputs.get(7)), 1, 2);
-        footergrid.add(new Label(inputs.get(8)), 2, 2);
-        footergrid.add(new Label(inputs.get(9)), 3, 2);
-        footergrid.add(new Label(inputs.get(10)), 4, 2);
+        footergrid.add(new Label("Members: "), 0, 3);
+        footergrid.add(new Label(inputs.get(7)), 1, 3);
+        footergrid.add(new Label(inputs.get(8)), 2, 3);
+        footergrid.add(new Label(inputs.get(9)), 3, 3);
+        footergrid.add(new Label(inputs.get(10)), 4, 3);
 
         borderPane.setBottom(pane);
 
