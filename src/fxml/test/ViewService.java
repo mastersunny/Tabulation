@@ -94,7 +94,7 @@ public class ViewService {
 
             while ((line = br.readLine()) != null) {
 
-                if (line == null && line.length() == 0) {
+                if (line == null || line.length()==0) {
                     continue;
                 }
 
@@ -127,6 +127,8 @@ public class ViewService {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException ex) {
+            
+            AlertMessage.showAlertMessage(Alert.AlertType.ERROR, "Please Select Course Carefully!");
             Logger.getLogger(ViewService.class.getName()).log(
                     Level.SEVERE, null, ex
             );
@@ -341,6 +343,11 @@ public class ViewService {
             br = new BufferedReader(new FileReader(file));
 
             while ((line = br.readLine()) != null) {
+                
+                
+                if(line==null || line.length()==0){
+                    continue;
+                }
 
                 String[] studentGpa = line.split(csvSplitBy);
 

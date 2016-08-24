@@ -50,7 +50,7 @@ public class Controller implements Initializable {
         Parent root;
 
         stage = (Stage) menuBar.getScene().getWindow();
-        root = FXMLLoader.load(getClass().getResource("FXMLDocument.fxml"));
+        root = FXMLLoader.load(getClass().getResource("MainFXML.fxml"));
         Scene scene = new Scene(root);
         stage.setScene(scene);
         stage.show();
