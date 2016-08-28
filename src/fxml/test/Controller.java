@@ -58,7 +58,7 @@ public class Controller implements Initializable {
     }
 
     @FXML
-    private void openCSV(ActionEvent event) {
+    private void openCourseList(ActionEvent event) {
 
         exportAsPDF.setVisible(false);
         fileChooser = new FileChooser();
@@ -69,6 +69,10 @@ public class Controller implements Initializable {
             service.openFileForCourse(file, mainLayout, exportAsPDF);
         }
     }
+    
+    
+    
+    
 
     @Override
     public void initialize(URL url, ResourceBundle rb

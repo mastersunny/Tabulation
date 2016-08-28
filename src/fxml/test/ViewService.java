@@ -12,7 +12,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.geometry.Insets;
@@ -46,6 +48,7 @@ public class ViewService {
     private FileChooser fileChooser;
     List<Student> studentList;
     List<Course> courseList;
+    Map<String, Student> studentMap;
     List<String> inputs;
     BorderPane mainLayout;
     private ComboBox<String> depts;
@@ -80,6 +83,7 @@ public class ViewService {
 
         courseList = new ArrayList<>();
         studentList = new ArrayList<>();
+        studentMap = new HashMap<String, Student>();
 
         BufferedReader br = null;
         String csvSplitBy = ",";
@@ -94,7 +98,7 @@ public class ViewService {
 
             while ((line = br.readLine()) != null) {
 
-                if (line == null || line.length()==0) {
+                if (line == null || line.length() == 0) {
                     continue;
                 }
 
@@ -125,13 +129,19 @@ public class ViewService {
             }
 
         } catch (FileNotFoundException e) {
+
+            AlertMessage.showAlertMessage(Alert.AlertType.ERROR, "Course list not found!");
             e.printStackTrace();
         } catch (IOException ex) {
-            
-            AlertMessage.showAlertMessage(Alert.AlertType.ERROR, "Please Select Course Carefully!");
+
+            AlertMessage.showAlertMessage(Alert.AlertType.ERROR, "Problem in opening course list!");
             Logger.getLogger(ViewService.class.getName()).log(
                     Level.SEVERE, null, ex
             );
+        } catch (Exception e) {
+
+            AlertMessage.showAlertMessage(Alert.AlertType.ERROR, e.getMessage());
+
         } finally {
             if (br != null) {
                 try {
@@ -183,8 +193,11 @@ public class ViewService {
 
                 if (file != null) {
                     openFileForStudent(file, button.getId().split(" "));
-                    button.setStyle("-fx-background-color:green");
-                    button.setText("Selected");
+                    if (studentList.size() != 0) {
+                        button.setStyle("-fx-background-color:green");
+                        button.setText("Selected");
+                    }
+
                 }
             });
             button.setPrefSize(100, 20);
@@ -296,13 +309,35 @@ public class ViewService {
 
         depts = new ComboBox<>();
         depts.getItems().addAll(
-                "CSE",
-                "EEE",
-                "CEP",
-                "ENG"
+                "Forestry & Environmental Science",
+                "Architecture",
+                "Chemical Engineering & Polymer Science",
+                "Civil & Environmental Engineering",
+                "Computer Science & Engineering",
+                "Electrical & Electronic Engineering",
+                "Food Engineering & Tea Technology",
+                "Industrial & Production Engineering",
+                "Mechanical Engineering",
+                "Petroleum and Mining Engineering",
+                "Biochemistry and Molecular Biology",
+                "Genetic Engineering & Biotechnology",
+                "Business Administration",
+                "Chemistry",
+                "Geography and Environment",
+                "Mathematics",
+                "Physics",
+                "Statistics",
+                "Anthropology",
+                "Bangla",
+                "Economics",
+                "English",
+                "Political Studies",
+                "Public Administration",
+                "Social Work",
+                "Sociology"
         );
 
-        depts.setPromptText("CSE");
+        depts.setPromptText("Computer Science & Engineering");
         depts.setEditable(true);
 
         return depts;
@@ -319,7 +354,8 @@ public class ViewService {
                 "5th SEMESTER",
                 "6th SEMESTER",
                 "7th SEMESTER",
-                "8th SEMESTER"
+                "8th SEMESTER",
+                "9th SEMESTER"
         );
 
         semesters.setEditable(true);
@@ -343,9 +379,8 @@ public class ViewService {
             br = new BufferedReader(new FileReader(file));
 
             while ((line = br.readLine()) != null) {
-                
-                
-                if(line==null || line.length()==0){
+
+                if (line == null || line.length() == 0) {
                     continue;
                 }
 
@@ -363,6 +398,7 @@ public class ViewService {
                     student = new Student(regNo);
                     student.setName(name);
                     this.studentList.add(student);
+                    studentMap.put(regNo,student);
 
                 }
 
@@ -373,11 +409,21 @@ public class ViewService {
             }
 
         } catch (FileNotFoundException e) {
+
+            AlertMessage.showAlertMessage(Alert.AlertType.ERROR, "Student list not found!");
             e.printStackTrace();
         } catch (IOException ex) {
+
+            AlertMessage.showAlertMessage(Alert.AlertType.ERROR, "Problem in opening student list!");
             Logger.getLogger(ViewService.class.getName()).log(
                     Level.SEVERE, null, ex
             );
+
+        } catch (Exception e) {
+
+            studentList.clear();
+            AlertMessage.showAlertMessage(Alert.AlertType.ERROR, e.getMessage());
+
         } finally {
             if (br != null) {
                 try {
@@ -391,10 +437,8 @@ public class ViewService {
 
     public Student checkForDuplicate(String regNo) {
 
-        for (Student student : studentList) {
-            if (student.getRegNo().equals(regNo)) {
-                return student;
-            }
+        if(studentMap.containsKey(regNo)){
+            return studentMap.get(regNo);
         }
         return null;
 

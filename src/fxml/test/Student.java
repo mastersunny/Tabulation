@@ -4,7 +4,7 @@ import fxml.test.CourseReg;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Student implements Comparable<Student>{
+public class Student implements Comparable<Student> {
 
     private String name;
     private String regNo;
@@ -12,6 +12,33 @@ public class Student implements Comparable<Student>{
     private double totalCredit;
     private double totalGpa;
     private String letterGrade;
+    private double CumulativeCredit;
+    private double CumulativeGrade;
+    private String cumulativeLetterGrade;
+
+    public String getCumulativeLetterGrade() {
+        return cumulativeLetterGrade;
+    }
+
+    public void setCumulativeLetterGrade(String cumulativeLetterGrade) {
+        this.cumulativeLetterGrade = cumulativeLetterGrade;
+    }
+
+    public double getCumulativeCredit() {
+        return CumulativeCredit;
+    }
+
+    public void setCumulativeCredit(double CumulativeCredit) {
+        this.CumulativeCredit = CumulativeCredit;
+    }
+
+    public double getCumulativeGrade() {
+        return CumulativeGrade;
+    }
+
+    public void setCumulativeGrade(double CumulativeGrade) {
+        this.CumulativeGrade = CumulativeGrade;
+    }
 
     public double getTotalCredit() {
         return totalCredit;
@@ -64,17 +91,17 @@ public class Student implements Comparable<Student>{
     public void setRegesteredCourse(List<CourseReg> regesteredCourse) {
         this.regesteredCourse = regesteredCourse;
     }
-    
+
     @Override
     public int compareTo(Student student) {
-     
-         return this.regNo.compareTo(student.getRegNo());
-         
+
+        return this.regNo.compareTo(student.getRegNo());
+
     }
 
     @Override
     public String toString() {
-        return "Student{" + "name=" + name + ", regNo=" + regNo + ", regesteredCourse=" + regesteredCourse + '}';
+        return "Student{" + "name=" + name + ", regNo=" + regNo + ", regesteredCourse=" + regesteredCourse + ", totalCredit=" + totalCredit + ", totalGpa=" + totalGpa + ", letterGrade=" + letterGrade + ", CumulativeCredit=" + CumulativeCredit + ", CumulativeGrade=" + CumulativeGrade + ", cumulativeLetterGrade=" + cumulativeLetterGrade + '}';
     }
 
 }

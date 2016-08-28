@@ -38,7 +38,7 @@
                 </Menu>
                 <Menu mnemonicParsing="false" text="File">
                     <items>
-                        <MenuItem fx:id="openCSV" mnemonicParsing="false" onAction="#openCSV" text="open CSV" />
+                        <MenuItem fx:id="openCourse" mnemonicParsing="false" onAction="#openCourseList" text="Open Course List" />
                         <SeparatorMenuItem mnemonicParsing="false" />
                         <MenuItem fx:id="exportAsPDF" mnemonicParsing="false" text="Export As PDF" />
                     </items>
