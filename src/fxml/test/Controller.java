@@ -40,6 +40,9 @@ public class Controller implements Initializable {
 
     @FXML
     private MenuItem exportAsPDF;
+    @FXML
+    private MenuItem openStudent;
+    
 
     ViewService service = new ViewService();
 
@@ -66,18 +69,18 @@ public class Controller implements Initializable {
         File file = fileChooser.showOpenDialog(window);
 
         if (file != null) {
-            service.openFileForCourse(file, mainLayout, exportAsPDF);
+            service.openFileForCourse(file, mainLayout, exportAsPDF,openStudent);
         }
     }
     
-    
-    
-    
+  
+      
 
     @Override
     public void initialize(URL url, ResourceBundle rb
     ) {
         exportAsPDF.setVisible(false);
+        openStudent.setDisable(true);
     }
 
     public void configureFileChooser(final FileChooser fileChooser) {

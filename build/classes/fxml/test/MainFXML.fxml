@@ -40,6 +40,8 @@
                     <items>
                         <MenuItem fx:id="openCourse" mnemonicParsing="false" onAction="#openCourseList" text="Open Course List" />
                         <SeparatorMenuItem mnemonicParsing="false" />
+                        <MenuItem fx:id="openStudent" mnemonicParsing="false" text="Open Student List" />
+                        <SeparatorMenuItem mnemonicParsing="false" />
                         <MenuItem fx:id="exportAsPDF" mnemonicParsing="false" text="Export As PDF" />
                     </items>
                 </Menu>  

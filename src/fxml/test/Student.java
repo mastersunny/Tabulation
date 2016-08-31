@@ -1,44 +1,25 @@
 package fxml.test;
 
-import fxml.test.CourseReg;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Student implements Comparable<Student> {
 
     private String name;
     private String regNo;
-    private List<CourseReg> regesteredCourse = new ArrayList<>();
+    private Map<String, CourseReg> regesteredCourse = new HashMap<>();
+
+    //curerent semester
     private double totalCredit;
+    private double Gpa;
     private double totalGpa;
-    private String letterGrade;
-    private double CumulativeCredit;
-    private double CumulativeGrade;
-    private String cumulativeLetterGrade;
-
-    public String getCumulativeLetterGrade() {
-        return cumulativeLetterGrade;
-    }
-
-    public void setCumulativeLetterGrade(String cumulativeLetterGrade) {
-        this.cumulativeLetterGrade = cumulativeLetterGrade;
-    }
-
-    public double getCumulativeCredit() {
-        return CumulativeCredit;
-    }
-
-    public void setCumulativeCredit(double CumulativeCredit) {
-        this.CumulativeCredit = CumulativeCredit;
-    }
-
-    public double getCumulativeGrade() {
-        return CumulativeGrade;
-    }
-
-    public void setCumulativeGrade(double CumulativeGrade) {
-        this.CumulativeGrade = CumulativeGrade;
-    }
+    private String LetterGrade="F";
+    //end current semester
+    //cumulative
+    private double cumulativeCredit;
+    private double cumulativeGpa;
+    private String cumulativeLetterGrade="F";
+    //end cumulative
 
     public double getTotalCredit() {
         return totalCredit;
@@ -46,6 +27,14 @@ public class Student implements Comparable<Student> {
 
     public void setTotalCredit(double totalCredit) {
         this.totalCredit = totalCredit;
+    }
+
+    public double getGpa() {
+        return Gpa;
+    }
+
+    public void setGpa(double Gpa) {
+        this.Gpa = Gpa;
     }
 
     public double getTotalGpa() {
@@ -57,11 +46,35 @@ public class Student implements Comparable<Student> {
     }
 
     public String getLetterGrade() {
-        return letterGrade;
+        return LetterGrade;
     }
 
-    public void setLetterGrade(String letterGrade) {
-        this.letterGrade = letterGrade;
+    public void setLetterGrade(String LetterGrade) {
+        this.LetterGrade = LetterGrade;
+    }
+
+    public double getCumulativeCredit() {
+        return cumulativeCredit;
+    }
+
+    public void setCumulativeCredit(double cumulativeCredit) {
+        this.cumulativeCredit = cumulativeCredit;
+    }
+
+    public double getCumulativeGpa() {
+        return cumulativeGpa;
+    }
+
+    public void setCumulativeGpa(double cumulativeGpa) {
+        this.cumulativeGpa = cumulativeGpa;
+    }
+
+    public String getCumulativeLetterGrade() {
+        return cumulativeLetterGrade;
+    }
+
+    public void setCumulativeLetterGrade(String cumulativeLetterGrade) {
+        this.cumulativeLetterGrade = cumulativeLetterGrade;
     }
 
     public Student(String regNo) {
@@ -84,12 +97,8 @@ public class Student implements Comparable<Student> {
         this.regNo = regNo;
     }
 
-    public List<CourseReg> getRegesteredCourse() {
+    public Map<String, CourseReg> getRegesteredCourse() {
         return regesteredCourse;
-    }
-
-    public void setRegesteredCourse(List<CourseReg> regesteredCourse) {
-        this.regesteredCourse = regesteredCourse;
     }
 
     @Override
@@ -101,7 +110,7 @@ public class Student implements Comparable<Student> {
 
     @Override
     public String toString() {
-        return "Student{" + "name=" + name + ", regNo=" + regNo + ", regesteredCourse=" + regesteredCourse + ", totalCredit=" + totalCredit + ", totalGpa=" + totalGpa + ", letterGrade=" + letterGrade + ", CumulativeCredit=" + CumulativeCredit + ", CumulativeGrade=" + CumulativeGrade + ", cumulativeLetterGrade=" + cumulativeLetterGrade + '}';
+        return "Student{" + "name=" + name + ", regNo=" + regNo + ", regesteredCourse=" + regesteredCourse + ", totalCredit=" + totalCredit + ", Gpa=" + Gpa + ", totalGpa=" + totalGpa + ", LetterGrade=" + LetterGrade + ", cumulativeCredit=" + cumulativeCredit + ", cumulativeGpa=" + cumulativeGpa + ", cumulativeLetterGrade=" + cumulativeLetterGrade + '}';
     }
 
 }

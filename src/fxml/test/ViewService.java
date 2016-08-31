@@ -64,6 +64,7 @@ public class ViewService {
     private TextField heldIn;
     MenuBar menuBar;
     MenuItem exportAsPDF;
+    MenuItem openStudent;
 
     public void configureFileChooser(final FileChooser fileChooser) {
 
@@ -76,10 +77,11 @@ public class ViewService {
         );
     }
 
-    public void openFileForCourse(File file, BorderPane mainLayout, MenuItem exportAsPDF) {
+    public void openFileForCourse(File file, BorderPane mainLayout, MenuItem exportAsPDF, MenuItem openStudent) {
 
         this.mainLayout = mainLayout;
         this.exportAsPDF = exportAsPDF;
+        this.openStudent = openStudent;
 
         courseList = new ArrayList<>();
         studentList = new ArrayList<>();
@@ -187,17 +189,34 @@ public class ViewService {
 
             button.setOnAction(e -> {
 
-                System.out.print(button.getId());
+                System.out.println("Button clicked: " + button.getId());
+
                 configureFileChooser(fileChooser);
                 File file = fileChooser.showOpenDialog(window);
 
                 if (file != null) {
-                    openFileForStudent(file, button.getId().split(" "));
-                    if (studentList.size() != 0) {
-                        button.setStyle("-fx-background-color:green");
-                        button.setText("Selected");
-                    }
 
+                    String[] courseCredit = button.getId().split(" ");
+
+                    if (file.getName().startsWith(courseCredit[0])) {
+
+                        openFileForStudentPerCourse(file, courseCredit);
+
+                        if (!studentList.isEmpty()) {
+
+                            button.setStyle("-fx-background-color:green");
+                            button.setText("Selected");
+                            openStudent.setDisable(false);
+
+                            openStudent.setOnAction(os -> {
+                                openFileForStudent();
+
+                            });
+                        }
+                    } else {
+
+                        AlertMessage.showAlertMessage(Alert.AlertType.WARNING, "Please Select a file similar to this label");
+                    }
                 }
             });
             button.setPrefSize(100, 20);
@@ -267,6 +286,7 @@ public class ViewService {
             } else {
 
                 createTabulationView();
+                openStudent.setDisable(true);
 
                 PDFService pDFService = new PDFService(studentList, courseList, inputs);
 
@@ -363,7 +383,7 @@ public class ViewService {
         return semesters;
     }
 
-    private void openFileForStudent(File file, String[] courseCredit) {
+    private void openFileForStudentPerCourse(File file, String[] courseCredit) {
 
         BufferedReader br = null;
         String line = "";
@@ -398,13 +418,23 @@ public class ViewService {
                     student = new Student(regNo);
                     student.setName(name);
                     this.studentList.add(student);
-                    studentMap.put(regNo,student);
+                    studentMap.put(regNo, student);
 
                 }
 
-                student
-                        .getRegesteredCourse()
-                        .add(new CourseReg(courseCode, Double.valueOf(credit), Double.valueOf(gpa), CgpaCalculator.getLetterGrade(Double.parseDouble(gpa))));
+                if (!student.getRegesteredCourse().containsKey(courseCode)) {
+
+                    student.getRegesteredCourse().put(courseCode, new CourseReg(courseCode, Double.valueOf(credit), Double.valueOf(gpa), CgpaCalculator.getLetterGrade(Double.parseDouble(gpa))));
+
+                    if (Double.valueOf(gpa) != 0) {
+                        //total credit for this semester
+                        student.setTotalCredit(student.getTotalCredit() + Double.valueOf(credit));
+                        //total gpa for this semester
+                        student.setTotalGpa(student.getTotalGpa() + (Double.valueOf(credit) * Double.valueOf(gpa)));
+
+                    }
+
+                }
 
             }
 
@@ -437,7 +467,7 @@ public class ViewService {
 
     public Student checkForDuplicate(String regNo) {
 
-        if(studentMap.containsKey(regNo)){
+        if (studentMap.containsKey(regNo)) {
             return studentMap.get(regNo);
         }
         return null;
@@ -520,17 +550,29 @@ public class ViewService {
             grid.add(courseBox, col++, row);
 
         }
-        Label totalCreditLabel = new Label("Total Credit");
-        totalCreditLabel.setPadding(new Insets(5, 5, 5, 5));
-        grid.add(totalCreditLabel, col++, row);
+        Label label1 = new Label("Total Credit");
+        label1.setPadding(new Insets(5, 5, 5, 5));
+        grid.add(label1, col++, row);
 
-        Label totalGPALabel = new Label("Total GPA");
-        totalGPALabel.setPadding(new Insets(5, 5, 5, 5));
-        grid.add(totalGPALabel, col++, row);
+        Label label2 = new Label("Total GPA");
+        label2.setPadding(new Insets(5, 5, 5, 5));
+        grid.add(label2, col++, row);
 
-        Label letterGradeLabel = new Label("Letter Grade");
-        letterGradeLabel.setPadding(new Insets(5, 5, 5, 5));
-        grid.add(letterGradeLabel, col++, row);
+        Label label3 = new Label("Letter Grade");
+        label3.setPadding(new Insets(5, 5, 5, 5));
+        grid.add(label3, col++, row);
+
+        Label label4 = new Label("Cumulative Credit");
+        label4.setPadding(new Insets(5, 5, 5, 5));
+        grid.add(label4, col++, row);
+
+        Label label5 = new Label("Cumulative GPA");
+        label5.setPadding(new Insets(5, 5, 5, 5));
+        grid.add(label5, col++, row);
+
+        Label label6 = new Label("Cumulative Letter Grade");
+        label6.setPadding(new Insets(5, 5, 5, 5));
+        grid.add(label6, col++, row);
 
         row = 1;
         boolean flag = false;
@@ -553,40 +595,38 @@ public class ViewService {
 
             double totalCredit = 0;
             double totalGpa = 0;
+
+            Map<String, CourseReg> regesteredCourse = student.getRegesteredCourse();
+
             for (Course course : courseList) {
 
-                flag = false;
-                for (CourseReg courseReg : student.getRegesteredCourse()) {
+                if (regesteredCourse.containsKey(course.getCourseCode())) {
+                    
+                    CourseReg courseReg = regesteredCourse.get(course.getCourseCode());
 
-                    if (course.getCourseCode().equalsIgnoreCase(courseReg.getCourseCode())) {
+                    HBox gpaLetterGrade = new HBox();
+                    gpaLetterGrade.setSpacing(20);
+                    gpaLetterGrade.setPadding(new Insets(5, 5, 5, 5));
+                    gpaLetterGrade.setAlignment(Pos.CENTER_LEFT);
+                    gpaLetterGrade.getChildren().addAll(new Label(String.format("%.02f", courseReg.getGpa())), new Label(courseReg.getLetterGrade()));
 
-                        HBox gpaLetterGrade = new HBox();
-                        gpaLetterGrade.setSpacing(20);
-                        gpaLetterGrade.setPadding(new Insets(5, 5, 5, 5));
-                        gpaLetterGrade.setAlignment(Pos.CENTER_LEFT);
-                        gpaLetterGrade.getChildren().addAll(new Label(String.format("%.02f", courseReg.getGpa())), new Label(courseReg.getLetterGrade()));
+                    grid.add(gpaLetterGrade, col++, row);
 
-                        grid.add(gpaLetterGrade, col++, row);
-                        flag = true;
-
-                        if (courseReg.getGpa() != 0) {
-                            totalCredit += courseReg.getCredit();
-                            totalGpa += (courseReg.getGpa() * courseReg.getCredit());
-                        }
-
-                        break;
-
-                    }
                 }
-
-                if (!flag) {
+                else{
+                    
                     Label emptyLabel = new Label(" ");
                     grid.add(emptyLabel, col++, row);
                 }
 
             }
 
-            if (totalCredit != 0) {
+            if (student.getTotalCredit() != 0) {
+
+                totalCredit = student.getTotalCredit();
+                totalGpa = student.getTotalGpa();
+                student.setLetterGrade(CgpaCalculator.getLetterGrade(totalGpa / totalCredit));
+                student.setGpa(totalGpa / totalCredit);
 
                 Label creditLabel = new Label(String.format("%.02f", totalCredit));
                 creditLabel.setPadding(new Insets(5, 5, 5, 5));
@@ -603,15 +643,36 @@ public class ViewService {
                 letterLabel.setTextAlignment(TextAlignment.CENTER);
                 grid.add(letterLabel, col++, row);
 
-                student.setTotalCredit(totalCredit);
-                student.setTotalGpa(totalGpa / totalCredit);
-                student.setLetterGrade(CgpaCalculator.getLetterGrade(totalGpa / totalCredit));
+            } else {
+
+                grid.add(new Label("0"), col++, row);
+                grid.add(new Label("0.00"), col++, row);
+                grid.add(new Label("F"), col++, row);
+             
+                
+            }
+            if (student.getCumulativeCredit() != 0) {
+
+                Label cumulativeCredit = new Label(String.format("%.02f", student.getCumulativeCredit()));
+                cumulativeCredit.setPadding(new Insets(5, 5, 5, 5));
+                cumulativeCredit.setTextAlignment(TextAlignment.CENTER);
+                grid.add(cumulativeCredit, col++, row);
+
+                Label cumulativeGpaLabel = new Label(String.format("%.02f", student.getCumulativeGpa()));
+                cumulativeGpaLabel.setPadding(new Insets(5, 5, 5, 5));
+                cumulativeGpaLabel.setTextAlignment(TextAlignment.CENTER);
+                grid.add(cumulativeGpaLabel, col++, row);
+
+                Label cumulativeLetterLabel = new Label(student.getCumulativeLetterGrade());
+                cumulativeLetterLabel.setPadding(new Insets(5, 5, 5, 5));
+                cumulativeLetterLabel.setTextAlignment(TextAlignment.CENTER);
+                grid.add(cumulativeLetterLabel, col++, row);
 
             } else {
 
-                grid.add(new Label(" "), col++, row);
-                grid.add(new Label(" "), col++, row);
-                grid.add(new Label(" "), col++, row);
+                grid.add(new Label("0"), col++, row);
+                grid.add(new Label("0.00"), col++, row);
+                grid.add(new Label("F"), col++, row);
 
             }
 
@@ -698,6 +759,88 @@ public class ViewService {
 
          return true;
          }*/
+        return true;
+
+    }
+
+    boolean openFileForStudent() {
+
+        fileChooser = new FileChooser();
+        configureFileChooser(fileChooser);
+        File file = fileChooser.showOpenDialog(window);
+
+        if (file != null) {
+
+            BufferedReader br = null;
+            String line = "";
+            String csvSplitBy = ",";
+            String regNo = null;
+            double cumulativeCredit = 0;
+            double CumulativeGpa = 0;
+            double currentSemesterCredit = 0;
+            double currentSemesterGpa = 0;
+            double cumulative = 0;
+
+            try {
+
+                br = new BufferedReader(new FileReader(file));
+
+                while ((line = br.readLine()) != null) {
+
+                    if (line == null || line.length() == 0) {
+                        continue;
+                    }
+
+                    String[] studentGpa = line.split(csvSplitBy);
+
+                    regNo = studentGpa[0].trim();
+
+                    Student student = checkForDuplicate(regNo);
+                    if (student != null) {
+
+                        cumulativeCredit = Double.valueOf(studentGpa[1].trim());
+                        CumulativeGpa = Double.valueOf(studentGpa[2].trim());
+                        currentSemesterCredit = student.getTotalCredit();
+                        currentSemesterGpa = student.getTotalGpa();
+
+                        student.setCumulativeCredit(cumulativeCredit + currentSemesterCredit);
+                        cumulative = ((cumulativeCredit * CumulativeGpa) + currentSemesterGpa) / (cumulativeCredit + currentSemesterCredit);
+
+                        student.setCumulativeGpa(cumulative);
+                        student.setCumulativeLetterGrade(CgpaCalculator.getLetterGrade(cumulative));
+
+                    }
+
+                }
+
+            } catch (FileNotFoundException e) {
+
+                AlertMessage.showAlertMessage(Alert.AlertType.ERROR, "Student list not found!");
+                e.printStackTrace();
+            } catch (IOException ex) {
+
+                AlertMessage.showAlertMessage(Alert.AlertType.ERROR, "Problem in opening student list!");
+                Logger.getLogger(ViewService.class.getName()).log(
+                        Level.SEVERE, null, ex
+                );
+
+            } catch (Exception e) {
+
+                studentList.clear();
+                AlertMessage.showAlertMessage(Alert.AlertType.ERROR, e.getMessage());
+
+            } finally {
+                if (br != null) {
+                    try {
+                        br.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+        }
+
         return true;
 
     }
