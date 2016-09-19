@@ -43,6 +43,8 @@
                         <MenuItem fx:id="openStudent" mnemonicParsing="false" text="Open Student List" />
                         <SeparatorMenuItem mnemonicParsing="false" />
                         <MenuItem fx:id="exportAsPDF" mnemonicParsing="false" text="Export As PDF" />
+                        <SeparatorMenuItem mnemonicParsing="false" />
+                        <MenuItem fx:id="exportAsCSV" mnemonicParsing="false" text="Export As CSV" />
                     </items>
                 </Menu>  
                 <Menu mnemonicParsing="false" text="Help">

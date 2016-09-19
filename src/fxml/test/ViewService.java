@@ -64,6 +64,7 @@ public class ViewService {
     private TextField heldIn;
     MenuBar menuBar;
     MenuItem exportAsPDF;
+    MenuItem exportAsCSV;
     MenuItem openStudent;
 
     public void configureFileChooser(final FileChooser fileChooser) {
@@ -77,11 +78,12 @@ public class ViewService {
         );
     }
 
-    public void openFileForCourse(File file, BorderPane mainLayout, MenuItem exportAsPDF, MenuItem openStudent) {
+    public void openFileForCourse(File file, BorderPane mainLayout, MenuItem exportAsPDF, MenuItem openStudent, MenuItem exportAsCSV) {
 
         this.mainLayout = mainLayout;
         this.exportAsPDF = exportAsPDF;
         this.openStudent = openStudent;
+        this.exportAsCSV = exportAsCSV;
 
         courseList = new ArrayList<>();
         studentList = new ArrayList<>();
@@ -288,15 +290,17 @@ public class ViewService {
                 createTabulationView();
                 openStudent.setDisable(true);
 
-                PDFService pDFService = new PDFService(studentList, courseList, inputs);
+                PDFService pdfService = new PDFService(studentList, courseList, inputs);
+                CSVService csvService = new CSVService(studentList, courseList);
 
                 exportAsPDF.setVisible(true);
+                exportAsCSV.setVisible(true);
 
                 exportAsPDF.setOnAction(et -> {
 
                     if (studentList.size() != 0 && isValadidInputs()) {
 
-                        pDFService.generatePdf();
+                        pdfService.generatePdf();
                         AlertMessage.showAlertMessage(Alert.AlertType.CONFIRMATION, "PDF Created Successfully!");
                     } else {
                         AlertMessage.showAlertMessage(Alert.AlertType.WARNING, "No Student List Selected");
@@ -304,6 +308,20 @@ public class ViewService {
                     }
 
                 });
+
+                exportAsCSV.setOnAction(et2 -> {
+
+                    if (studentList.size() != 0) {
+
+                        csvService.generateCSV();
+                        AlertMessage.showAlertMessage(Alert.AlertType.CONFIRMATION, "CSV Created Successfully!");
+                    } else {
+                        AlertMessage.showAlertMessage(Alert.AlertType.WARNING, "No Student List Selected");
+
+                    }
+
+                });
+
             }
         });
         button.setMinSize(100, 100);
@@ -619,7 +637,7 @@ public class ViewService {
             for (Course course : courseList) {
 
                 if (regesteredCourse.containsKey(course.getCourseCode())) {
-                    
+
                     CourseReg courseReg = regesteredCourse.get(course.getCourseCode());
 
                     HBox gpaLetterGrade = new HBox();
@@ -630,9 +648,8 @@ public class ViewService {
 
                     grid.add(gpaLetterGrade, col++, row);
 
-                }
-                else{
-                    
+                } else {
+
                     Label emptyLabel = new Label(" ");
                     grid.add(emptyLabel, col++, row);
                 }
@@ -648,7 +665,7 @@ public class ViewService {
 
                 Label creditLabel = new Label(String.format("%.02f", totalCredit));
                 creditLabel.setPadding(new Insets(5, 5, 5, 5));
-                creditLabel.setAlignment(Pos.CENTER);  
+                creditLabel.setAlignment(Pos.CENTER);
                 grid.add(creditLabel, col++, row);
 
                 Label gpaLabel = new Label(String.format("%.02f", (totalGpa / totalCredit)));
@@ -662,24 +679,22 @@ public class ViewService {
                 grid.add(letterLabel, col++, row);
 
             } else {
-                
-               
+
                 Label creditLabel = new Label("0");
                 creditLabel.setPadding(new Insets(5, 5, 5, 5));
                 creditLabel.setAlignment(Pos.CENTER);
                 grid.add(creditLabel, col++, row);
-              
+
                 Label gpaLabel = new Label("0.00");
                 gpaLabel.setPadding(new Insets(5, 5, 5, 5));
                 gpaLabel.setAlignment(Pos.CENTER);
                 grid.add(gpaLabel, col++, row);
-                
+
                 Label letterLabel = new Label("F");
                 letterLabel.setPadding(new Insets(5, 5, 5, 5));
                 letterLabel.setAlignment(Pos.CENTER);
                 grid.add(letterLabel, col++, row);
-          
-                
+
             }
             if (student.getCumulativeCredit() != 0) {
 
@@ -757,50 +772,35 @@ public class ViewService {
 
     private boolean isValadidInputs() {
 
-        inputs = new ArrayList<>();
-        inputs.add("Department of Computer Science & Engineering");
-        inputs.add("8th SEMESTER");
-        inputs.add("2014");
-        inputs.add("2011-12");
-        inputs.add("October 2014");
-        inputs.add("Md. Eamin Rahman");
-        inputs.add("Md. Mujibur Rahman");
-        inputs.add("Md Masum");
-        inputs.add("Md. Saiful Islam");
-        inputs.add("Husne Ara Chowdhury");
-        inputs.add("Sabir Ismail");
-
         if (!chairman.getText().isEmpty()
-         && !controller.getText().isEmpty()
-         && !session.getText().isEmpty()
-         && !year.getText().isEmpty()
-         && !member1.getText().isEmpty()
-         && !member2.getText().isEmpty()
-         && !member3.getText().isEmpty()
-         && !member4.getText().isEmpty()
-         && !heldIn.getText().isEmpty()) {
-            
-           
-            
-         inputs = new ArrayList<>();
-            
-         inputs.add(depts.getValue());
-         inputs.add(semesters.getValue());
-         inputs.add(year.getText());
-         inputs.add(session.getText());
-         inputs.add(heldIn.getText());
-         inputs.add(chairman.getText());
-         inputs.add(controller.getText());
-         inputs.add(member1.getText());
-         inputs.add(member2.getText());
-         inputs.add(member3.getText());
-         inputs.add(member4.getText());
-            
-         System.err.println(depts.getValue());
+                && !controller.getText().isEmpty()
+                && !session.getText().isEmpty()
+                && !year.getText().isEmpty()
+                && !member1.getText().isEmpty()
+                && !member2.getText().isEmpty()
+                && !member3.getText().isEmpty()
+                && !member4.getText().isEmpty()
+                && !heldIn.getText().isEmpty()) {
 
-         return true;
-         }
-        return true;
+            inputs = new ArrayList<>();
+
+            inputs.add(depts.getValue());
+            inputs.add(semesters.getValue());
+            inputs.add(year.getText());
+            inputs.add(session.getText());
+            inputs.add(heldIn.getText());
+            inputs.add(chairman.getText());
+            inputs.add(controller.getText());
+            inputs.add(member1.getText());
+            inputs.add(member2.getText());
+            inputs.add(member3.getText());
+            inputs.add(member4.getText());
+
+            System.err.println(depts.getValue());
+
+            return true;
+        }
+        return false;
 
     }
 

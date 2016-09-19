@@ -41,6 +41,8 @@ public class Controller implements Initializable {
     @FXML
     private MenuItem exportAsPDF;
     @FXML
+    private MenuItem exportAsCSV;  
+    @FXML
     private MenuItem openStudent;
     
 
@@ -64,12 +66,13 @@ public class Controller implements Initializable {
     private void openCourseList(ActionEvent event) {
 
         exportAsPDF.setVisible(false);
+        exportAsCSV.setVisible(false);
         fileChooser = new FileChooser();
         configureFileChooser(fileChooser);
         File file = fileChooser.showOpenDialog(window);
 
         if (file != null) {
-            service.openFileForCourse(file, mainLayout, exportAsPDF,openStudent);
+            service.openFileForCourse(file, mainLayout, exportAsPDF,openStudent,exportAsCSV);
         }
     }
     
@@ -80,6 +83,7 @@ public class Controller implements Initializable {
     public void initialize(URL url, ResourceBundle rb
     ) {
         exportAsPDF.setVisible(false);
+        exportAsCSV.setVisible(false);
         openStudent.setDisable(true);
     }
 
