@@ -37,8 +37,8 @@ public class CSVService {
             List<String[]> list = new ArrayList<>();
             String courses[] = new String[courseList.size() + 8];
             int i = 2;
-            courses[0] = "Name";
-            courses[1] = "Reg No";
+            courses[0] = "Reg No";
+            courses[1] = "Name";
             for (Course course : courseList) {
 
                 courses[i++] = "(" + course.getCourseCode() + "_" + course.getSemester() + "_" + course.getCredit() + ")";

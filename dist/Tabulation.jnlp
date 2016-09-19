@@ -8,7 +8,7 @@
   </information>
   <resources>
     <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
-    <jar href="Tabulation.jar" size="475339" download="eager" />
+    <jar href="Tabulation.jar" size="475374" download="eager" />
     <jar href="lib/commons-lang3-3.1.jar" size="315805" download="eager" />
     <jar href="lib/itext-pdfa-5.5.9-javadoc.jar" size="476210" download="eager" />
     <jar href="lib/itext-pdfa-5.5.9-sources.jar" size="126192" download="eager" />

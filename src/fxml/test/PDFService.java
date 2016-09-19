@@ -72,7 +72,7 @@ public class PDFService {
                 list.add("Remarks");
                 list.add("GC");
 
-                if (inputs.get(1).contains("8th SEMESTER")) {
+                if (inputs.get(1).contains("8th")) {
 
                     list.add("PC. No");
                     list.add("OC. No");
@@ -175,7 +175,7 @@ public class PDFService {
 
         String s1 = inputs.get(1).trim();
         String s2 = inputs.get(2).trim();
-        String semesterText = ("B.Sc (Engg.) " + s1 + " EXAMINATION " + s2);
+        String semesterText = ("B.Sc (Engg.) " + s1 + " SEMESTER EXAMINATION " + s2);
 
         String session = inputs.get(3).trim();
         String date = inputs.get(4).trim();

@@ -347,35 +347,35 @@ public class ViewService {
 
         depts = new ComboBox<>();
         depts.getItems().addAll(
-                "Forestry & Environmental Science",
-                "Architecture",
-                "Chemical Engineering & Polymer Science",
-                "Civil & Environmental Engineering",
-                "Computer Science & Engineering",
-                "Electrical & Electronic Engineering",
-                "Food Engineering & Tea Technology",
-                "Industrial & Production Engineering",
-                "Mechanical Engineering",
-                "Petroleum and Mining Engineering",
-                "Biochemistry and Molecular Biology",
-                "Genetic Engineering & Biotechnology",
-                "Business Administration",
-                "Chemistry",
-                "Geography and Environment",
-                "Mathematics",
-                "Physics",
-                "Statistics",
-                "Anthropology",
-                "Bangla",
-                "Economics",
-                "English",
-                "Political Studies",
-                "Public Administration",
-                "Social Work",
-                "Sociology"
+                "Department of Forestry & Environmental Science",
+                "Department of Architecture",
+                "Department of Chemical Engineering & Polymer Science",
+                "Department of Civil & Environmental Engineering",
+                "Department of Computer Science & Engineering",
+                "Department of Electrical & Electronic Engineering",
+                "Department of Food Engineering & Tea Technology",
+                "Department of Industrial & Production Engineering",
+                "Department of Mechanical Engineering",
+                "Department of Petroleum and Mining Engineering",
+                "Department of Biochemistry and Molecular Biology",
+                "Department of Genetic Engineering & Biotechnology",
+                "Department of Business Administration",
+                "Department of Chemistry",
+                "Department of Geography and Environment",
+                "Department of Mathematics",
+                "Department of Physics",
+                "Department of Statistics",
+                "Department of Anthropology",
+                "Department of Bangla",
+                "Department of Economics",
+                "Department of English",
+                "Department of Political Studies",
+                "Department of Public Administration",
+                "Department of Social Work",
+                "Department of Sociology"
         );
 
-        depts.setPromptText("Computer Science & Engineering");
+        depts.setPromptText("Department of Computer Science & Engineering");
         depts.setEditable(true);
 
         return depts;
@@ -385,15 +385,15 @@ public class ViewService {
 
         semesters = new ComboBox<>();
         semesters.getItems().addAll(
-                "1st SEMESTER",
-                "2nd SEMESTER",
-                "3rd SEMESTER",
-                "4th SEMESTER",
-                "5th SEMESTER",
-                "6th SEMESTER",
-                "7th SEMESTER",
-                "8th SEMESTER",
-                "9th SEMESTER"
+                "1st",
+                "2nd",
+                "3rd",
+                "4th",
+                "5th",
+                "6th",
+                "7th",
+                "8th",
+                "9th"
         );
 
         semesters.setEditable(true);
