@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.scene.control.Alert;
 
 /**
  *
@@ -40,13 +41,14 @@ public class PDFService {
     Font font7 = new Font(Font.FontFamily.TIMES_ROMAN, 7);
 
     List<Student> studentList;
-    List<Course> courseList;
+    List<Object> list;
     List<String> inputs;
 
     public PDFService(List<Student> studentList, List<Course> courseList, List<String> inputs) {
 
+        list = new ArrayList<>();
         this.studentList = studentList;
-        this.courseList = courseList;
+        this.list.addAll(courseList);
         this.inputs = inputs;
     }
 
@@ -61,16 +63,31 @@ public class PDFService {
             document.setMargins(90, 80, 35, 40);
             document.open();
 
-            if (!courseList.isEmpty()) {
+            if (!list.isEmpty()) {
 
-                Collections.sort(courseList);
+                list.add("Total Credit");
+                list.add("Total GPA");
+                list.add("Letter Grade");
+                list.add("Cumulative");
+                list.add("Remarks");
+                list.add("GC");
 
-                int courseCount = 0;
-                int totalCoureseSize = courseList.size();
-                int totalCourseLoop = (totalCoureseSize / 12);
+                if (inputs.get(1).contains("8th SEMESTER")) {
+
+                    list.add("PC. No");
+                    list.add("OC. No");
+                    list.add("D/AF. No");
+                    list.add("Others");
+                }
+
+                int totalCoureseSize = list.size();
+                int totalCourseLoop = totalCoureseSize / 12;
                 int courseLoopVariable = 0;
 
-                int studentCount = 0;
+                if (totalCoureseSize % 12 > 0) {
+                    totalCourseLoop += 1;
+                }
+
                 int totalStudentSize = studentList.size();
                 int totalStudentLoop = (totalStudentSize / 15);
                 int studentLoopVariable = 0;
@@ -88,93 +105,35 @@ public class PDFService {
 
                             for (courseLoopVariable = 0; courseLoopVariable < totalCourseLoop; courseLoopVariable++) {
 
+                                int courseStart = courseLoopVariable * 12;
+                                int studentStart = studentLoopVariable * 15;
+                                
                                 //start document header
                                 document.add(createDocumentHeader());
                                 //end document header
 
-                                //Start main table header
-                                int courseStart = courseLoopVariable * 12;
-                                PdfPTable table = createMainTableHeader(courseStart);
-                                //end main table header
+                                //start table header
+                                PdfPTable table = createTableHeader(courseStart);
+                                //end table header
 
-                                //start main table body    
-                                int studentStart = studentLoopVariable * 15;
-                                table = createMainTableBody(studentStart, courseStart, table);
-                                //end main table body
+                                //start table body
+                                table = createTableBody(studentStart, courseStart,table);
+                                //end table body
 
-                                //start document footer
+                                //adding table and footer
                                 table.setSpacingAfter(27);
                                 document.add(table);
                                 document.add(createFooter1());
                                 document.add(createFooter2());
+                                //end adding table and footer
+                                //go to new page..
                                 document.newPage();
-                                //end document footer
-
                             }
-                        }
-
-                        int courseStart = courseLoopVariable * 12;
-                        int studentStart = studentLoopVariable * 15;
-
-                        //for course % 12 > 0
-                        List<Object> list = new ArrayList<>();
-
-                        for (int i = courseStart; i < totalCoureseSize; i++) {
-                            list.add(courseList.get(i));
-                        }
-
-                        list.add("Total Credit");
-                        list.add("Total GPA");
-                        list.add("Letter Grade");
-                        list.add("Cumulative");
-                        list.add("Remarks");
-                        list.add("GC");
-
-                        if (inputs.get(1).contains("8th SEMESTER")) {
-                            
-                            list.add("PC. No");
-                            list.add("OC. No");
-                            list.add("D/AF. No");
-                            list.add("Others");
-                        }
-
-                        int totalExtraSize = list.size();
-                        int totalExtraLoop = totalExtraSize / 12;
-                        int extraLoopVariable = 0;
-
-                        if (totalExtraSize % 12 > 0) {
-                            totalExtraLoop += 1;
-                        }
-
-                        //this will print the extra courses and the other fields
-                        for (extraLoopVariable = 0; extraLoopVariable < totalExtraLoop; extraLoopVariable++) {
-
-                            //start document header
-                            document.add(createDocumentHeader());
-                            //end document header
-
-                            //start exatra header
-                            int start = extraLoopVariable * 12;
-                            PdfPTable table = createExtraHeader(start, list);
-                            //end extra header
-
-                            //start extra body
-                            table = createExtraTableBody(studentStart, start, list, table);
-                            //end extra body
-
-                            //adding table and footer
-                            table.setSpacingAfter(27);
-                            document.add(table);
-                            document.add(createFooter1());
-                            document.add(createFooter2());
-                            //end adding table and footer
-                            document.newPage();
-
                         }
                     }
                 }
             }
-
+            
             document.close();
 
         } catch (DocumentException e) {
@@ -182,6 +141,7 @@ public class PDFService {
         } catch (IOException e) {
             e.printStackTrace();
         } catch (Exception e) {
+            AlertMessage.showAlertMessage(Alert.AlertType.ERROR, "Error creating Pdf document.Please try again");
             e.printStackTrace();
         }
     }
@@ -394,125 +354,7 @@ public class PDFService {
         return table;
 
     }
-
-    public PdfPTable createMainTableHeader(int courseStart) {
-
-        PdfPTable table = new PdfPTable(14);
-        table.setHorizontalAlignment(Element.ALIGN_LEFT);
-
-        try {
-            table.setTotalWidth(new float[]{57.5f, 159.4f, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44});
-            table.setLockedWidth(true);
-
-        } catch (DocumentException ex) {
-            Logger.getLogger(PDFService.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        PdfPCell regCell = getCellForString("Reg No.", 0, true, Element.ALIGN_MIDDLE, Element.ALIGN_CENTER, font9, false);
-        regCell.setPaddingTop(0f);
-        table.addCell(regCell);
-
-        PdfPCell nameCell = getNameCell();
-        nameCell.setPaddingBottom(2f);
-        table.addCell(nameCell);
-
-        int courseCount = 1;
-
-        //printing the courses first for the header
-        for (int j = courseStart; j < courseList.size(); j++) {
-
-            Course course = (Course) courseList.get(j);
-
-            PdfPCell cell3 = new PdfPCell(createCourseInfo(course));
-            cell3.setPaddingTop(1f);
-            cell3.setPaddingBottom(2f);
-            //cell3.setVerticalAlignment(Element.ALIGN_MIDDLE);
-            table.addCell(cell3);
-
-            if (courseCount == 12) {
-                break;
-            }
-            courseCount++;
-        }
-
-        return table;
-
-    }
-
-    public PdfPTable createMainTableBody(int studentStart, int courseStart, PdfPTable table) throws DocumentException {
-
-        int studentCount = 1;
-
-        for (int j = studentStart; j < studentList.size(); j++) {
-
-            Student student = (Student) studentList.get(j);
-
-            PdfPCell regCell = getCellForString(student.getRegNo(), 0, true, Element.ALIGN_MIDDLE, Element.ALIGN_CENTER, font9, false);
-            regCell.setPaddingTop(1f);
-            regCell.setPaddingBottom(4f);
-
-            PdfPCell nameCell = getCellForString(student.getName(), 0, true, Element.ALIGN_MIDDLE, 0, font9, false);
-            nameCell.setPaddingTop(1f);
-            nameCell.setPaddingBottom(4f);
-            nameCell.setPaddingLeft(5f);
-
-            table.addCell(regCell);
-            table.addCell(nameCell);
-
-            int colCount = 1;
-
-            //Getting student's regestered courses for current semester.
-            Map<String, CourseReg> regesteredCourse = student.getRegesteredCourse();
-
-            for (int k = courseStart; k < courseList.size(); k++) {
-
-                Course course = (Course) courseList.get(k);
-
-                if (regesteredCourse.containsKey(course.getCourseCode())) {
-
-                    CourseReg courseReg = regesteredCourse.get(course.getCourseCode());
-
-                    PdfPTable table1 = new PdfPTable(2);
-                    table1.setTotalWidth(44f);
-                    table1.setLockedWidth(true);
-
-                    PdfPCell cell1 = getCellForString(String.format("%.02f", courseReg.getGpa()), 0, false, Element.ALIGN_MIDDLE, Element.ALIGN_CENTER, font9, false);
-                    cell1.setPaddingTop(1f);
-                    cell1.setPaddingBottom(4f);
-
-                    PdfPCell cell2 = getCellForString(courseReg.getLetterGrade(), 0, false, Element.ALIGN_MIDDLE, Element.ALIGN_CENTER, font9, false);
-                    cell2.setPaddingTop(1f);
-                    cell2.setPaddingBottom(4f);
-
-                    table1.addCell(cell1);
-                    table1.addCell(cell2);
-
-                    PdfPCell cell3 = new PdfPCell(table1);
-                    cell3.setPaddingTop(0f);
-                    cell3.setPaddingBottom(0f);
-                    table.addCell(cell3);
-
-                } else {
-                    table.addCell(new PdfPCell());
-                }
-
-                if (colCount == 12) {
-                    break;
-                }
-                colCount++;
-
-            }
-
-            if (studentCount == 15) {
-                break;
-            }
-            studentCount++;
-
-        }
-
-        return table;
-    }
-
+    
     public PdfPCell getCellForString(String args, int colSpan, boolean border, int vertical, int horizontal, Font font, boolean wrap) {
 
         PdfPCell cell = new PdfPCell(new Paragraph(args, font));
@@ -601,7 +443,7 @@ public class PDFService {
 
     }
 
-    public PdfPTable createExtraHeader(int start, List<Object> list) {
+    public PdfPTable createTableHeader(int start) {
 
         PdfPTable table = null;
 
@@ -747,7 +589,7 @@ public class PDFService {
 
     }
 
-    private PdfPTable createExtraTableBody(int studentStart, int start, List<Object> list, PdfPTable table) {
+    private PdfPTable createTableBody(int studentStart, int start, PdfPTable table) {
 
         int studentCount = 1;
 
@@ -876,21 +718,6 @@ public class PDFService {
         }
 
         return table;
-
-//        PdfPTable table1 = new PdfPTable(3);
-//            table1.setTotalWidth(88f);
-//            table1.setLockedWidth(true);
-//
-//            PdfPCell cell1 = new PdfPCell();
-//
-//            table1.addCell(cell1);
-//            table1.addCell(cell1);
-//            table1.addCell(cell1);
-//
-//            PdfPCell cell2 = new PdfPCell(table1);
-//            cell2.setPaddingTop(0f);
-//            cell2.setPaddingBottom(0f);
-//            table.addCell(cell2);
     }
 
 }

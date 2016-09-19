@@ -552,26 +552,44 @@ public class ViewService {
         }
         Label label1 = new Label("Total Credit");
         label1.setPadding(new Insets(5, 5, 5, 5));
+        label1.setPrefWidth(60);
+        label1.setWrapText(true);
+        label1.setAlignment(Pos.CENTER);
         grid.add(label1, col++, row);
 
         Label label2 = new Label("Total GPA");
         label2.setPadding(new Insets(5, 5, 5, 5));
+        label2.setPrefWidth(60);
+        label2.setWrapText(true);
+        label2.setAlignment(Pos.CENTER);
         grid.add(label2, col++, row);
 
         Label label3 = new Label("Letter Grade");
         label3.setPadding(new Insets(5, 5, 5, 5));
+        label3.setPrefWidth(60);
+        label3.setWrapText(true);
+        label3.setAlignment(Pos.CENTER);
         grid.add(label3, col++, row);
 
         Label label4 = new Label("Cumulative Credit");
         label4.setPadding(new Insets(5, 5, 5, 5));
+        label4.setPrefWidth(80);
+        label4.setWrapText(true);
+        label4.setAlignment(Pos.CENTER);
         grid.add(label4, col++, row);
 
         Label label5 = new Label("Cumulative GPA");
         label5.setPadding(new Insets(5, 5, 5, 5));
+        label5.setPrefWidth(80);
+        label5.setWrapText(true);
+        label5.setAlignment(Pos.CENTER);
         grid.add(label5, col++, row);
 
         Label label6 = new Label("Cumulative Letter Grade");
         label6.setPadding(new Insets(5, 5, 5, 5));
+        label6.setPrefWidth(100);
+        label6.setWrapText(true);
+        label6.setAlignment(Pos.CENTER);
         grid.add(label6, col++, row);
 
         row = 1;
@@ -630,49 +648,72 @@ public class ViewService {
 
                 Label creditLabel = new Label(String.format("%.02f", totalCredit));
                 creditLabel.setPadding(new Insets(5, 5, 5, 5));
-                creditLabel.setTextAlignment(TextAlignment.CENTER);
+                creditLabel.setAlignment(Pos.CENTER);  
                 grid.add(creditLabel, col++, row);
 
                 Label gpaLabel = new Label(String.format("%.02f", (totalGpa / totalCredit)));
                 gpaLabel.setPadding(new Insets(5, 5, 5, 5));
-                gpaLabel.setTextAlignment(TextAlignment.CENTER);
+                gpaLabel.setAlignment(Pos.CENTER);
                 grid.add(gpaLabel, col++, row);
 
                 Label letterLabel = new Label(CgpaCalculator.getLetterGrade(totalGpa / totalCredit));
                 letterLabel.setPadding(new Insets(5, 5, 5, 5));
-                letterLabel.setTextAlignment(TextAlignment.CENTER);
+                letterLabel.setAlignment(Pos.CENTER);
                 grid.add(letterLabel, col++, row);
 
             } else {
-
-                grid.add(new Label("0"), col++, row);
-                grid.add(new Label("0.00"), col++, row);
-                grid.add(new Label("F"), col++, row);
-             
+                
+               
+                Label creditLabel = new Label("0");
+                creditLabel.setPadding(new Insets(5, 5, 5, 5));
+                creditLabel.setAlignment(Pos.CENTER);
+                grid.add(creditLabel, col++, row);
+              
+                Label gpaLabel = new Label("0.00");
+                gpaLabel.setPadding(new Insets(5, 5, 5, 5));
+                gpaLabel.setAlignment(Pos.CENTER);
+                grid.add(gpaLabel, col++, row);
+                
+                Label letterLabel = new Label("F");
+                letterLabel.setPadding(new Insets(5, 5, 5, 5));
+                letterLabel.setAlignment(Pos.CENTER);
+                grid.add(letterLabel, col++, row);
+          
                 
             }
             if (student.getCumulativeCredit() != 0) {
 
                 Label cumulativeCredit = new Label(String.format("%.02f", student.getCumulativeCredit()));
                 cumulativeCredit.setPadding(new Insets(5, 5, 5, 5));
-                cumulativeCredit.setTextAlignment(TextAlignment.CENTER);
+                cumulativeCredit.setAlignment(Pos.CENTER);
                 grid.add(cumulativeCredit, col++, row);
 
                 Label cumulativeGpaLabel = new Label(String.format("%.02f", student.getCumulativeGpa()));
                 cumulativeGpaLabel.setPadding(new Insets(5, 5, 5, 5));
-                cumulativeGpaLabel.setTextAlignment(TextAlignment.CENTER);
+                cumulativeGpaLabel.setAlignment(Pos.CENTER);
                 grid.add(cumulativeGpaLabel, col++, row);
 
                 Label cumulativeLetterLabel = new Label(student.getCumulativeLetterGrade());
                 cumulativeLetterLabel.setPadding(new Insets(5, 5, 5, 5));
-                cumulativeLetterLabel.setTextAlignment(TextAlignment.CENTER);
+                cumulativeLetterLabel.setAlignment(Pos.CENTER);
                 grid.add(cumulativeLetterLabel, col++, row);
 
             } else {
 
-                grid.add(new Label("0"), col++, row);
-                grid.add(new Label("0.00"), col++, row);
-                grid.add(new Label("F"), col++, row);
+                Label cumulativeCredit = new Label("0");
+                cumulativeCredit.setPadding(new Insets(5, 5, 5, 5));
+                cumulativeCredit.setAlignment(Pos.CENTER);
+                grid.add(cumulativeCredit, col++, row);
+
+                Label cumulativeGpaLabel = new Label("0.00");
+                cumulativeGpaLabel.setPadding(new Insets(5, 5, 5, 5));
+                cumulativeGpaLabel.setAlignment(Pos.CENTER);
+                grid.add(cumulativeGpaLabel, col++, row);
+
+                Label cumulativeLetterLabel = new Label("F");
+                cumulativeLetterLabel.setPadding(new Insets(5, 5, 5, 5));
+                cumulativeLetterLabel.setAlignment(Pos.CENTER);
+                grid.add(cumulativeLetterLabel, col++, row);
 
             }
 
@@ -718,7 +759,7 @@ public class ViewService {
 
         inputs = new ArrayList<>();
         inputs.add("Department of Computer Science & Engineering");
-        inputs.add("5th SEMESTER");
+        inputs.add("8th SEMESTER");
         inputs.add("2014");
         inputs.add("2011-12");
         inputs.add("October 2014");
@@ -729,7 +770,7 @@ public class ViewService {
         inputs.add("Husne Ara Chowdhury");
         inputs.add("Sabir Ismail");
 
-        /*if (!chairman.getText().isEmpty()
+        if (!chairman.getText().isEmpty()
          && !controller.getText().isEmpty()
          && !session.getText().isEmpty()
          && !year.getText().isEmpty()
@@ -758,7 +799,7 @@ public class ViewService {
          System.err.println(depts.getValue());
 
          return true;
-         }*/
+         }
         return true;
 
     }
