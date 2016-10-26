@@ -32,7 +32,7 @@ public class CSVService {
 
         try {
 
-            CSVWriter writer = new CSVWriter(new FileWriter("yourfile.csv"), ',');
+            CSVWriter writer = new CSVWriter(new FileWriter("table.csv"), ',');
 
             List<String[]> list = new ArrayList<>();
             String courses[] = new String[courseList.size() + 8];

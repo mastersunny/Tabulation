@@ -160,8 +160,10 @@ public class PDFService {
         }
 
         Image image = Image.getInstance(getClass().getClassLoader().getResource("img/sust.jpg"));
-        PdfPCell imageCell = new PdfPCell(image, true);
-        imageCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        image.scalePercent(42f);
+        image.setAlignment(Element.ALIGN_LEFT);
+        PdfPCell imageCell = new PdfPCell(image, false);
+        imageCell.setPaddingTop(6);
         imageCell.setBorder(Rectangle.NO_BORDER);
         headerTable.addCell(imageCell);
 
@@ -198,7 +200,7 @@ public class PDFService {
         resultPublishDateCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
         resultPublishDateCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
         headerTable.addCell(resultPublishDateCell);
-        headerTable.setSpacingAfter(18);
+        headerTable.setSpacingAfter(17.5f);
         // System.err.println("completed header table");
         return headerTable;
         //end creating header for the document......
@@ -263,7 +265,7 @@ public class PDFService {
         table.addCell(nameColumn2);
         table.addCell(cell2);
 
-        table.setSpacingAfter(24);
+        table.setSpacingAfter(23.5f);
         return table;
     }
 
@@ -281,7 +283,6 @@ public class PDFService {
         }
 
         PdfPCell underLine = new PdfPCell(new Paragraph("_____________________"));
-        //underLine.setPaddingLeft(0f);
         underLine.setBorder(Rectangle.NO_BORDER);
 
         PdfPCell blankColumn = new PdfPCell(new Paragraph(" "));
@@ -307,11 +308,11 @@ public class PDFService {
         PdfPCell cell6 = new PdfPCell(new Paragraph(inputs.get(10).trim(), font9));
         cell6.setBorder(Rectangle.TOP);
 
-        PdfPCell memberSIgnature = new PdfPCell(new Paragraph("Signature of the Members:", font9));
-        memberSIgnature.setPaddingLeft(0f);
-        memberSIgnature.setBorder(Rectangle.NO_BORDER);
+        PdfPCell memberSignature = new PdfPCell(new Paragraph("Signature of the Members:", font9));
+        memberSignature.setPaddingLeft(0f);
+        memberSignature.setBorder(Rectangle.NO_BORDER);
 
-        table.addCell(memberSIgnature);
+        table.addCell(memberSignature);
         table.addCell(blankColumn);
         table.addCell(blankColumn);
         table.addCell(blankColumn);
@@ -329,20 +330,12 @@ public class PDFService {
         table.addCell(blankColumn);
         table.addCell(cell6);
 
-        table.addCell(blankColumn);
-        table.addCell(blankColumn);
-        table.addCell(blankColumn);
-        table.addCell(blankColumn);
-        table.addCell(blankColumn);
-        table.addCell(blankColumn);
-        table.addCell(blankColumn);
-        table.addCell(blankColumn);
+        PdfPCell tabulatorSignature = new PdfPCell(new Paragraph("Signature of the Tabulators:", font9));
+        tabulatorSignature.setPaddingLeft(0f);
+        tabulatorSignature.setPaddingTop(13f);
+        tabulatorSignature.setBorder(Rectangle.NO_BORDER);
 
-        PdfPCell tabulatorSIgnature = new PdfPCell(new Paragraph("Signature of the Tabulators:", font9));
-        tabulatorSIgnature.setPaddingLeft(0f);
-        tabulatorSIgnature.setBorder(Rectangle.NO_BORDER);
-
-        table.addCell(tabulatorSIgnature);
+        table.addCell(tabulatorSignature);
         table.addCell(blankColumn2);
         table.addCell(blankColumn);
         table.addCell(blankColumn2);
@@ -380,7 +373,7 @@ public class PDFService {
         }
         cell.setVerticalAlignment(vertical);
         cell.setHorizontalAlignment(horizontal);
-        cell.setPaddingTop(1f);
+        cell.setPaddingTop(0.8f);
         if (!flag) {
             cell.setBorder(Rectangle.NO_BORDER);
         }
@@ -598,12 +591,12 @@ public class PDFService {
             Student student = (Student) studentList.get(j);
 
             PdfPCell regCell = getCellForString(student.getRegNo(), 0, true, Element.ALIGN_MIDDLE, Element.ALIGN_CENTER, font9, false);
-            regCell.setPaddingTop(1f);
-            regCell.setPaddingBottom(4f);
+            regCell.setPaddingTop(2f);
+            regCell.setPaddingBottom(3.85f);
 
             PdfPCell nameCell = getCellForString(student.getName(), 0, true, Element.ALIGN_MIDDLE, 0, font9, false);
             nameCell.setPaddingTop(1f);
-            nameCell.setPaddingBottom(4f);
+            nameCell.setPaddingBottom(3.85f);
             nameCell.setPaddingLeft(5f);
 
             table.addCell(regCell);
